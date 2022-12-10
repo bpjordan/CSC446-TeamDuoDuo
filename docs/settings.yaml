@@ -1,0 +1,34 @@
+---
+#Files to read from, will be combined into single document
+input-files:
+- 1_intro.md
+
+output-file: docs.pdf
+standalone: true
+
+#Only let pandoc access this folder and its children
+sandbox: true
+
+#Table of Contents settings
+table-of-contents: true
+toc-depth: 3
+number-sections: true
+
+#Metadata passed to latex template
+metadata:
+  title: Access Controls & Covert Channels Project
+  subtitle: Team DuoDuo
+  author:
+    - Bronson Jordan
+    - Brendan Guillory
+    - Promyse Ward
+    - Sydney Holland
+
+  documentclass: article
+  papersize: letter
+  geometry:
+  - margin=0.5in
+
+  fontfamily: bera
+  mainfont: Bera Sans
+...

@@ -29,3 +29,7 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+  pandoc:
+    build: ./docs
+    volumes:
+      - ./docs:/data
