@@ -17,8 +17,6 @@ COPY src/* src/
 
 RUN cargo build --bin server
 
-RUN ls -lahR .
-
 FROM debian:buster-slim AS run
 
 EXPOSE 80
