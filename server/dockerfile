@@ -1,9 +1,32 @@
-FROM node:alpine
+# vim: set ft=dockerfile :
+FROM rust:1.65.0 AS build
+
+RUN rustup override set nightly
+
+RUN cargo new --bin /usr/local/src/builder
+
+WORKDIR /usr/local/src/builder
+
+COPY Cargo.toml Cargo.toml
+
+RUN cargo build
+
+RUN rm src/*.rs
+
+COPY src/* src/
+
+RUN cargo build --bin server
+
+RUN ls -lahR .
+
+FROM debian:buster-slim AS run
+
+EXPOSE 80
 
 WORKDIR /app
 
-COPY package.json ./
+COPY --from=build /usr/local/src/builder/target/debug/server .
 
-RUN npm install
+COPY Rocket.toml .
 
-CMD [ "npm", "run", "start" ]
+ENTRYPOINT [ "/app/server" ]

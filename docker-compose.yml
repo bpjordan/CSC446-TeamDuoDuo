@@ -22,10 +22,9 @@ services:
       - MYSQLUSER=root
       - MYSQLPASS=example
     volumes:
-      - ./server/backend:/app/backend
-      - ./server/frontend:/app/frontend
+      - ./server/static:/app/static
     ports:
-      - "80:80"
+      - 80:80
     depends_on:
       mysql:
         condition: service_healthy
