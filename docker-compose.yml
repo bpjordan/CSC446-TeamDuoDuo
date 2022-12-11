@@ -32,3 +32,5 @@ services:
     build: ./docs
     volumes:
       - ./docs:/data
+    profiles:
+      - mkdocs
