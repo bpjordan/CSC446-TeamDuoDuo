@@ -1,6 +1,7 @@
 #[macro_use] extern crate rocket;
 
 use rocket::fs::FileServer;
+use rocket::http::Status;
 use rocket::serde::{Serialize, Deserialize, json::Json};
 use rocket_db_pools::{Database, Connection};
 use rocket_db_pools::sqlx::{self, Row};
@@ -25,15 +26,15 @@ fn index() -> &'static str {
 }
 
 #[get("/query")]
-async fn raw_query(mut db: Connection<SiteDB>) -> Option<Json<Vec<User>>> {
+async fn raw_query(mut db: Connection<SiteDB>) -> Result<Json<Vec<User>>, (Status, &'static str)> {
 
     let users = sqlx::query("SELECT * FROM users;")
     .fetch(&mut *db)
     .map_ok(|r| User{username: r.get("username"), password: r.get("password"), email: r.get("email") })
     .try_collect::<Vec<_>>()
-    .await.ok()?;
+    .await.map_err(|_| (Status::InternalServerError, "Database query failed"))?;
 
-    Some(Json(users))
+    Ok(Json(users))
 }
 
 #[launch]
