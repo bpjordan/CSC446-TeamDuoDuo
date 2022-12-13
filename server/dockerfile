@@ -1,30 +1,40 @@
 # vim: set ft=dockerfile :
-FROM rust:1.65.0 AS build
+#Use cargo-chef to build dependencies separately from main binary
+FROM lukemathwalker/cargo-chef:0.1.50-rust-1.65.0-bullseye AS chef
 
-RUN rustup override set nightly
+#Rocket requires the nightly Rust toolchain for now
+RUN rustup default nightly
 
-RUN cargo new --bin /usr/local/src/builder
+WORKDIR /builder
 
-WORKDIR /usr/local/src/builder
+#Prepare a list of dependencies
+FROM chef AS prepare
 
-COPY Cargo.toml Cargo.toml
+COPY . .
 
-RUN cargo build
+RUN cargo chef prepare --recipe-path recipe.json
 
-RUN rm src/*.rs
+FROM chef AS build
 
-COPY src/* src/
+COPY --from=prepare /builder/recipe.json recipe.json
 
-RUN cargo build --bin server
+#Build dependencies separately from main since dependencies take ages
+RUN cargo chef cook --release --recipe-path recipe.json
 
-FROM debian:buster-slim AS run
+COPY . .
+
+RUN cargo build --release
+
+#Finally, copy server over to a bare image to reduce bulk of final image
+FROM debian:buster-slim AS runtime
 
 EXPOSE 80
 
 WORKDIR /app
 
-COPY --from=build /usr/local/src/builder/target/debug/server .
+COPY --from=build /builder/target/release/server .
 
+#Rocket needs Rocket.toml config file in its runtime environment
 COPY Rocket.toml .
 
 ENTRYPOINT [ "/app/server" ]
