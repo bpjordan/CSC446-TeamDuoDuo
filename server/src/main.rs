@@ -6,7 +6,7 @@ use rocket::serde::{Serialize, Deserialize, json::Json};
 use rocket_db_pools::{Database, Connection};
 use rocket_db_pools::sqlx::{self, Row};
 
-use rocket::futures::{stream::TryStreamExt};
+use rocket::futures::stream::TryStreamExt;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
