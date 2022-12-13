@@ -32,9 +32,18 @@ async fn raw_query(mut db: Connection<SiteDB>) -> Result<Json<Vec<User>>, (Statu
     Ok(Json(users))
 }
 
-#[post("/login")]
-async fn login_user(mut _db: Connection<SiteDB>) -> Status {
-    Status::Unauthorized
+#[post("/login?<username>&<password>")]
+async fn login_user(mut db: Connection<SiteDB>, username: &str, password: &str) -> Status {
+
+    let user = sqlx::query("SELECT username FROM users WHERE username = ? AND password = ?").bind(username).bind(password)
+    .fetch_optional(&mut *db).await;
+
+    match user {
+        Ok(Some(_)) => Status::Ok,
+        Ok(None) => Status::Unauthorized,
+        Err(_) => Status::InternalServerError,
+    }
+
 }
 
 #[launch]
