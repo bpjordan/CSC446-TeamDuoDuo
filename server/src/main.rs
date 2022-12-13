@@ -20,11 +20,6 @@ struct User {
 #[database("maindb")]
 struct SiteDB(sqlx::MySqlPool);
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, World!"
-}
-
 #[get("/query")]
 async fn raw_query(mut db: Connection<SiteDB>) -> Result<Json<Vec<User>>, (Status, &'static str)> {
 
@@ -37,11 +32,16 @@ async fn raw_query(mut db: Connection<SiteDB>) -> Result<Json<Vec<User>>, (Statu
     Ok(Json(users))
 }
 
+#[post("/login")]
+async fn login_user(mut _db: Connection<SiteDB>) -> Status {
+    Status::Unauthorized
+}
+
 #[launch]
 fn rocket() -> _ {
 
     rocket::build()
     .attach(SiteDB::init())
     .mount("/", FileServer::from("/app/static"))
-    .mount("/api", routes!(index, raw_query))
+    .mount("/api", routes!(raw_query, login_user))
 }
