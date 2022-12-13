@@ -21,7 +21,7 @@ COPY --from=prepare /builder/recipe.json recipe.json
 #Build dependencies separately from main since dependencies take ages
 RUN cargo chef cook --release --recipe-path recipe.json
 
-COPY . .
+COPY src src
 
 RUN cargo build --release
 
