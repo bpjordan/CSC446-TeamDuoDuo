@@ -23,6 +23,8 @@ RUN cargo chef cook --release --recipe-path recipe.json
 
 COPY src src
 
+RUN touch src/main.rs
+
 RUN cargo build --release
 
 #Finally, copy server over to a bare image to reduce bulk of final image
