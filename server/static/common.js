@@ -13,3 +13,23 @@ function query() {
         console.log(err);
     })
 }
+
+function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    fetch("http://" + parsedUrl.host + "/api/login?" + username + "&" + password, {
+        method: "POST",
+        mode: "no-cors"
+    })
+    .then((resp) => {
+        resp.text();
+        console.log(resp.statusText)
+        if(resp.status == 200) {
+            location.href = "/"
+        }
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
