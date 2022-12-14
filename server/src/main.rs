@@ -1,4 +1,7 @@
 #[macro_use] extern crate rocket;
+extern crate argon2;
+
+use argon2::{Argon2, PasswordVerifier, PasswordHash};
 
 use rocket::fs::FileServer;
 use rocket::http::Status;
@@ -33,15 +36,30 @@ async fn raw_query(mut db: Connection<SiteDB>) -> Result<Json<Vec<User>>, (Statu
 }
 
 #[post("/login?<username>&<password>")]
-async fn login_user(mut db: Connection<SiteDB>, username: &str, password: &str) -> Status {
+async fn login_user(mut db: Connection<SiteDB>, username: &str, password: &str) -> Result<Status, Status> {
 
-    let user = sqlx::query("SELECT username FROM users WHERE username = ? AND password = ?").bind(username).bind(password)
+    if password.len() < 3 { return Ok(Status::BadRequest) };
+
+    let hashslinginghasher = Argon2::default();
+
+    let entry = sqlx::query("SELECT password FROM users WHERE username = ?").bind(username)
     .fetch_optional(&mut *db).await;
 
-    match user {
-        Ok(Some(_)) => Status::Ok,
-        Ok(None) => Status::Unauthorized,
-        Err(_) => Status::InternalServerError,
+    let pwhash = match &entry {
+        Ok(Some(row)) => Ok(row.get(0)),
+        Ok(None) => Ok("$argon2id$v=19$m=4096,t=3,p=1$7cw5ikPiUevZbFw3Oc67GQ$5BfCIWW7v4pYqqHkaDtF2H7G7TXts9+EX69KW5kCyMA"), //hash for an empty string. This ensures the algorithm is still run to dissuade timing attacks
+        Err(_) => Err(Status::InternalServerError),
+    }?;
+
+    let hash_result = hashslinginghasher.verify_password(
+        password.as_bytes(),
+        &PasswordHash::new(pwhash).map_err(|_| Status::InternalServerError)?
+    );
+
+    match hash_result {
+        Ok(()) => Ok(Status::Ok),
+        Err(argon2::password_hash::Error::Password) => Ok(Status::Unauthorized),
+        _ => Err(Status::InternalServerError)
     }
 
 }
