@@ -22,3 +22,7 @@ body {
     margin-left: 40%;
     cursor: pointer;
 }
+
+.error {
+    color: #cf3232;
+}

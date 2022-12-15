@@ -18,15 +18,24 @@ function login() {
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    fetch("http://" + parsedUrl.host + "/api/login?" + username + "&" + password, {
+    fetch("http://" + parsedUrl.host + "/api/login?username=" + username + "&password=" + password, {
         method: "POST",
         mode: "no-cors"
     })
     .then((resp) => {
         resp.text();
-        console.log(resp.statusText)
         if(resp.status == 200) {
-            location.href = "/"
+            location.href = "/";
+        }
+        else if(resp.status == 401) {
+            document.getElementById("error").textContent = "Username not found, please try again.";
+            document.getElementById("username").style.backgroundColor = '#cf3232';
+            document.getElementById("password").style.backgroundColor = '#ffffff';
+        }
+        else if(resp.status == 500) {
+            document.getElementById("error").textContent = "Incorrect password, please try again.";
+            document.getElementById("password").style.backgroundColor = '#cf3232';
+            document.getElementById("username").style.backgroundColor = '#ffffff';
         }
     })
     .catch((err) => {
