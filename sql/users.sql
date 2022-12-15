@@ -11,7 +11,22 @@ CREATE TABLE users (
 
 INSERT INTO users
 VALUES(
-    "user",
-    "$argon2id$v=19$m=4096,t=3,p=1$JdzJMju1ONSYs/MEyLw7Pg$ZazGKYrgaFX5OXwmnMrQsrXnA38lQ7CFzCuv05rpGhM",
-    "user@example.com"
+    "brendan",
+    "$argon2id$v=19$m=4096,t=3,p=1$UmRxb2ZHQmV2cDBQUG1odw$ZvpuZy/7QJ9aZnx1cbwitw",
+    "brendan@example.com"
+),
+(
+    "bronson",
+    "$argon2id$v=19$m=4096,t=3,p=1$UmRxb2ZHQmV2cDBQUG1odw$puIZlAash2vZjfDOXuVfFA",
+    "bronson@example.com"
+),
+(
+    "sydney",
+    "$argon2id$v=19$m=4096,t=3,p=1$UmRxb2ZHQmV2cDBQUG1odw$puIZlAash2vZjfDOXuVfFA",
+    "sydney@example.com"
+),
+(
+    "promyse",
+    "$argon2id$v=19$m=4096,t=3,p=1$UmRxb2ZHQmV2cDBQUG1odw$pXvskGPmY0HSLy1dpADpFw",
+    "promyse@example.com"
 );
