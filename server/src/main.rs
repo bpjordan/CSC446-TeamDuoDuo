@@ -5,6 +5,7 @@ use argon2::{Argon2, PasswordVerifier, PasswordHash};
 
 use rocket::fs::FileServer;
 use rocket::http::Status;
+use rocket::response::Redirect;
 use rocket::serde::{Serialize, Deserialize, json::Json};
 use rocket_db_pools::{Database, Connection};
 use rocket_db_pools::sqlx::{self, Row};
@@ -33,6 +34,11 @@ async fn raw_query(mut db: Connection<SiteDB>) -> Result<Json<Vec<User>>, (Statu
     .await.map_err(|_| (Status::InternalServerError, "Database query failed"))?;
 
     Ok(Json(users))
+}
+
+#[get("/")]
+fn redirect_to_login() -> Redirect {
+    Redirect::to(uri!("/login.html"))
 }
 
 #[post("/login?<username>&<password>")]
@@ -70,5 +76,6 @@ fn rocket() -> _ {
     rocket::build()
     .attach(SiteDB::init())
     .mount("/", FileServer::from("/app/static"))
+    .mount("/", routes!(redirect_to_login))
     .mount("/api", routes!(raw_query, login_user))
 }
