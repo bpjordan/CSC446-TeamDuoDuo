@@ -25,17 +25,10 @@ function login() {
     .then((resp) => {
         resp.text();
         if(resp.status == 200) {
-            location.href = "/";
+            location.href = "/index.html";
         }
         else if(resp.status == 401) {
-            document.getElementById("error").textContent = "Username not found, please try again.";
-            document.getElementById("username").style.backgroundColor = '#cf3232';
-            document.getElementById("password").style.backgroundColor = '#ffffff';
-        }
-        else if(resp.status == 500) {
-            document.getElementById("error").textContent = "Incorrect password, please try again.";
-            document.getElementById("password").style.backgroundColor = '#cf3232';
-            document.getElementById("username").style.backgroundColor = '#ffffff';
+            document.getElementById("error").textContent = "Incorrect username or password, please try again.";
         }
     })
     .catch((err) => {
