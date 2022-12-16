@@ -69,17 +69,15 @@ fn redirect_to_login() -> Redirect {
 #[post("/login?<username>&<password>")]
 async fn login_user(mut db: Connection<SiteDB>, username: &str, password: &str) -> Result<Status, Status> {
 
-    if password.len() < 3 { return Ok(Status::BadRequest) };
-
     let hashslinginghasher = Argon2::default();
 
     let entry = sqlx::query("SELECT password FROM users WHERE username = ?").bind(username)
     .fetch_optional(&mut *db).await.map_err(log_server_err("fetching user from database"))?;
 
     let pwhash = match &entry {
-        Some(row) => Ok(row.get(0)),
-        None => Ok("$argon2id$v=19$m=4096,t=3,p=1$7cw5ikPiUevZbFw3Oc67GQ$5BfCIWW7v4pYqqHkaDtF2H7G7TXts9+EX69KW5kCyMA"), //hash for an empty string. This ensures the algorithm is still run to dissuade timing attacks
-    }?;
+        Some(row) => row.get(0),
+        None => return Ok(Status::Unauthorized),
+    };
 
     let hash_result = hashslinginghasher.verify_password(
         password.as_bytes(),
