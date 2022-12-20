@@ -5,6 +5,7 @@ use std::fmt::Debug;
 
 use argon2::{Argon2, PasswordVerifier, PasswordHash, password_hash::Error::Password};
 
+use rocket::form::Form;
 use rocket::fs::FileServer;
 use rocket::http::Status;
 use rocket::response::Redirect;
@@ -95,6 +96,17 @@ async fn login_user(mut db: Connection<SiteDB>, username: &str, password: &str) 
 
 }
 
+#[derive(FromForm)]
+struct UserCredentials<'r> {
+    username: &'r str,
+    password: &'r str,
+}
+
+#[post("/login", data = "<creds>")]
+async fn login_user_form(db: Connection<SiteDB>, creds: Form<UserCredentials<'_>>) -> Result<Status, Status> {
+    login_user(db, creds.username, creds.password).await
+}
+
 #[launch]
 fn rocket() -> _ {
 
@@ -102,5 +114,5 @@ fn rocket() -> _ {
     .attach(SiteDB::init())
     .mount("/", FileServer::from("/app/static"))
     .mount("/", routes!(redirect_to_login))
-    .mount("/api", routes!(raw_query, login_user))
+    .mount("/api", routes!(raw_query, login_user, login_user_form))
 }
