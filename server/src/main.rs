@@ -67,44 +67,39 @@ fn redirect_to_login() -> Redirect {
     Redirect::to(uri!("/login.html"))
 }
 
-#[post("/login?<username>&<password>")]
-async fn login_user(mut db: Connection<SiteDB>, username: &str, password: &str) -> Result<Status, Status> {
-
-    let hashslinginghasher = Argon2::default();
-
-    let entry = sqlx::query("SELECT password FROM users WHERE username = ?").bind(username)
-    .fetch_optional(&mut *db).await.map_err(log_server_err("fetching user from database"))?;
-
-    let pwhash = match &entry {
-        Some(row) => row.get(0),
-        None => return Ok(Status::Unauthorized),
-    };
-
-    let hash_result = hashslinginghasher.verify_password(
-        password.as_bytes(),
-        &PasswordHash::new(pwhash).map_err(log_server_err("parsing hash from database"))?
-    );
-
-    match hash_result {
-        Ok(()) => Ok(Status::Ok),
-        Err(e) => match e {
-            Password => Ok(Status::Unauthorized),
-            _ => Err(Status::InternalServerError)
-        },
-
-    }
-
-}
-
 #[derive(FromForm)]
 struct UserCredentials<'r> {
     username: &'r str,
     password: &'r str,
 }
 
-#[post("/login", data = "<creds>")]
-async fn login_user_form(db: Connection<SiteDB>, creds: Form<UserCredentials<'_>>) -> Result<Status, Status> {
-    login_user(db, creds.username, creds.password).await
+#[post("/login", data="<creds>")]
+async fn login_user(mut db: Connection<SiteDB>, creds: Form<UserCredentials<'_>>) -> Result<Redirect, Status> {
+
+    let hashslinginghasher = Argon2::default();
+
+    let entry = sqlx::query("SELECT password FROM users WHERE username = ?").bind(creds.username)
+    .fetch_optional(&mut *db).await.map_err(log_server_err("fetching user from database"))?;
+
+    let pwhash = match &entry {
+        Some(row) => row.get(0),
+        None => return Err(Status::Unauthorized),
+    };
+
+    let hash_result = hashslinginghasher.verify_password(
+        creds.password.as_bytes(),
+        &PasswordHash::new(pwhash).map_err(log_server_err("parsing hash from database"))?
+    );
+
+    match hash_result {
+        Ok(()) => Ok(Redirect::to(uri!("/index.html"))),
+        Err(e) => match e {
+            Password => Err(Status::Unauthorized),
+            _ => Err(Status::InternalServerError)
+        },
+
+    }
+
 }
 
 #[launch]
@@ -114,5 +109,5 @@ fn rocket() -> _ {
     .attach(SiteDB::init())
     .mount("/", FileServer::from("/app/static"))
     .mount("/", routes!(redirect_to_login))
-    .mount("/api", routes!(raw_query, login_user, login_user_form))
+    .mount("/api", routes!(raw_query, login_user))
 }

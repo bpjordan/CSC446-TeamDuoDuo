@@ -22,7 +22,7 @@ Checks if a user exists in the database with the correct username & password.
 If login is correct, returns `200 OK` status code.  
 If login is incorrect, returns `401 Unauthorized` status code.  
 
-HTTP Parameters:
+Request body should include HTTP form with parameters:
 - `username`: username to check
 - `password`: password to check, as plaintext
 
