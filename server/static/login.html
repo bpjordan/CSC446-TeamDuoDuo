@@ -12,18 +12,18 @@
 </head>
 
 <body>
-    <div class="content">
+    <form action="/login" method="post" class="content">
         <h1>Welcome to DuoDuo</h1>
         <h3>Login to your PC Box:</h3>
-        <label>Username</label>
-        <input type="text" id="username">
+        <label for="username">Username</label>
+        <input name="username" type="text" id="username">
         <p></p>
-        <label>Password</label>
-        <input type="password" id="password">
+        <label for="password">Password</label>
+        <input name="password" type="password" id="password">
         <p></p>
-        <button class="button" onclick="login()">Login</button>
+        <button class="button">Login</button>
         <p class="error" id="error"></p>
-    </div>
+    </form>
 </body>
 
 </html>
