@@ -14,12 +14,13 @@ Note: All APIs will respond with `500 Internal Server Error` if any error occurs
 ### /api/query (GET)
 
 Queries the database server for all entries in the `users` table.  
+Requires a header with the token provided by `/api/login`.
 Responds with `200 OK` and a JSON string representing the `users` table.  
 
 ### /api/login (POST)
 
 Checks if a user exists in the database with the correct username & password.  
-If login is correct, returns `200 OK` status code.  
+If login is correct, returns `200 OK` status codeand an authentication token.   
 If login is incorrect, returns `401 Unauthorized` status code.  
 
 Request body should include HTTP form with parameters:
