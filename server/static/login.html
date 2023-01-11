@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <form action="/api/login" method="post" class="content">
+    <form class="content" id="loginForm">
         <h1>Welcome to DuoDuo</h1>
         <h3>Login to your PC Box:</h3>
         <label for="username">Username</label>
@@ -21,7 +21,7 @@
         <label for="password">Password</label>
         <input name="password" type="password" id="password">
         <p></p>
-        <button class="button">Login</button>
+        <button class="button" onclick="login(event)">Login</button>
         <p class="error" id="error"></p>
     </form>
 </body>

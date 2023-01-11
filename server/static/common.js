@@ -1,37 +1,62 @@
 var parsedUrl = new URL(window.location.href);
 
 function query() {
+
+    // Request data using session token
     fetch("http://" + parsedUrl.host + "/api/query", {
         method: "GET",
-        mode: "no-cors",
+        headers: {
+            "Authorization": document.cookie,
+        },
+        mode: "no-cors"
     })
+
+    // Convert response to text
     .then((resp) => resp.text())
+
+    // Display data to user
     .then((data) => {
         document.getElementById("response").innerHTML = data;
     })
+
+    // Log request errors
     .catch((err) => {
         console.log(err);
     })
 }
 
-function login() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+function login(e) {
 
-    fetch("http://" + parsedUrl.host + "/api/login?username=" + username + "&password=" + password, {
+    // Stop form submission
+    e.preventDefault();
+
+    // Get form using id
+    var form = document.getElementById("loginForm");
+
+    // Authenticate user using form data
+    fetch("http://" + parsedUrl.host + "/api/login", {
         method: "POST",
+        body: new URLSearchParams(new FormData(form)),
         mode: "no-cors"
     })
-    .then((resp) => {
-        resp.text();
-        if(resp.status == 200) {
-            location.href = "/index.html";
-        }
-        else if(resp.status == 401) {
+
+    // Check for errors in request
+    .then (res => {
+        if (res.ok) {return res.text()}
+        else {throw Error(res.status)}
+    })
+
+    // Save session token and naviagte to main page
+    .then(body => {
+        document.cookie = JSON.parse(body).token;
+        location.href = "/index.html";
+    })
+
+    // Display errors to user
+    .catch((error) => {
+        console.log(error)
+        if (error.message == 401) {
             document.getElementById("error").textContent = "Incorrect username or password, please try again.";
         }
-    })
-    .catch((err) => {
-        console.log(err);
-    })
+    });
 }
