@@ -1,7 +1,7 @@
 
 use rand::RngCore;
+use rocket::outcome::IntoOutcome;
 use rocket::request::{Request, FromRequest, Outcome};
-use rocket::http::Status;
 use rocket::serde::{Serialize, Deserialize};
 use jsonwebtoken::{TokenData, Header, Validation, EncodingKey, DecodingKey};
 use rocket_db_pools::{Connection, sqlx};
@@ -16,12 +16,6 @@ pub struct UserSession {
     pub exp: u64,
     pub user: String,
     pub session: String,
-}
-
-#[derive(Debug)]
-pub enum AuthError {
-    _MissingKey,
-    InvalidKey
 }
 
 const SECRET_ENV_VAR: &'static str = "SERVER_JWT_SECRET";
@@ -41,32 +35,35 @@ pub fn get_jwt_secret() -> String {
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for UserSession {
-    type Error = AuthError;
+    type Error = ();
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
 
         let conn = req.guard::<Connection<db::Users>>().await.unwrap();
-        if let Some(t) = req.headers().get_one("Authorization") {
-            let claim = match parse_jwt(t) {
-                Ok(t) => t.claims,
-                Err(_) => return Outcome::Failure((Status::BadRequest, AuthError::InvalidKey)),
-            };
-            if is_valid(&claim, conn).await {
-                return Outcome::Success(claim)
-            }
-        }
 
-        Outcome::Forward(())
+        let claims = req.cookies()
+            .get_private("session_token")
+            .and_then(|c| parse_jwt(c.value()))
+            .and_then(|t| Some(t.claims));
+
+        let valid = match &claims {
+            Some(c) => is_valid(c, conn).await,
+            None => false,
+        };
+
+        claims
+            .filter(|_| valid)
+            .or_forward(())
 
     }
 }
 
-pub fn parse_jwt<'a> (token: &'a str) -> jsonwebtoken::errors::Result<TokenData<UserSession>> {
+pub fn parse_jwt<'a> (token: &'a str) -> Option<TokenData<UserSession>> {
     jsonwebtoken::decode(
         &token,
         &DecodingKey::from_secret(get_jwt_secret().as_bytes()),
         &Validation::default()
-    )
+    ).ok()
 }
 
 async fn is_valid(claim: &UserSession ,mut conn: Connection<db::Users>) -> bool {

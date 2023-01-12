@@ -5,13 +5,12 @@ use std::fmt::Debug;
 
 use argon2::{Argon2, PasswordVerifier, PasswordHash, password_hash::Error::Password};
 
+use auth::generate_jwt;
 use rand::RngCore;
 use rocket::form::Form;
 use rocket::fs::FileServer;
-use rocket::http::Status;
-use rocket::response::{Redirect, status};
-use rocket::serde::json::Value;
-use rocket::serde::json::serde_json::json;
+use rocket::http::{Status, CookieJar, Cookie};
+use rocket::response::Redirect;
 use rocket::serde::{Serialize, Deserialize, json::Json};
 use rocket_db_pools::{Database, Connection};
 use rocket_db_pools::sqlx::{self, Row};
@@ -70,6 +69,11 @@ async fn raw_query(_user_session: auth::UserSession ,mut db: Connection<db::User
     Ok(Json(users))
 }
 
+#[get("/query", rank = 2)]
+fn query_unauthorized() -> Status {
+    Status::Unauthorized
+}
+
 #[get("/")]
 fn redirect_to_login() -> Redirect {
     Redirect::to(uri!("/login.html"))
@@ -82,7 +86,7 @@ struct UserCredentials {
 }
 
 #[post("/login", data="<creds>")]
-async fn login_user(mut db: Connection<db::Users>, creds: Form<UserCredentials>) -> Result<status::Custom<Value>, Status> {
+async fn login_user(creds: Form<UserCredentials>, cookies: &CookieJar<'_>, mut db: Connection<db::Users>) -> Result<Status, Status> {
 
     let hashslinginghasher = Argon2::default();
 
@@ -111,7 +115,9 @@ async fn login_user(mut db: Connection<db::Users>, creds: Form<UserCredentials>)
     sqlx::query("UPDATE users SET session = ? WHERE username = ?").bind(&session).bind(&creds.username)
     .execute(&mut *db).await.unwrap();
 
-    Ok(status::Custom(Status::Ok, json!({"token": auth::generate_jwt(creds.username.clone(), session)})))
+    cookies.add_private(Cookie::new("session_token", generate_jwt(creds.username.clone(), session)));
+
+    Ok(Status::Ok)
 
 }
 
@@ -122,5 +128,5 @@ fn rocket() -> _ {
     .attach(db::Users::init())
     .mount("/", FileServer::from("/app/static"))
     .mount("/", routes!(redirect_to_login))
-    .mount("/api", routes!(raw_query, login_user))
+    .mount("/api", routes!(raw_query, query_unauthorized, login_user))
 }

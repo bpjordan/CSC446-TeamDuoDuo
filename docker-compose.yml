@@ -21,6 +21,7 @@ services:
       - MYSQLHOST=mysql
       - MYSQLUSER=root
       - MYSQLPASS=example
+      - ROCKET_SECRET_KEY=f50e8807774fb9792e874d6dfa6fda5603e9ff9c7b7faff7d4aed737292c681c
     volumes:
       - ./server/static:/app/static
     ports:
