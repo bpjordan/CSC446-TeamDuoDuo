@@ -45,15 +45,13 @@ function login(e) {
     })
 
     // Check for errors in request
+    // If no errors, navigate to main page
     .then (res => {
-        if (res.ok) {return res.text()}
+        if (res.ok) {
+            document.cookie = "cookie=valid"
+            location.href = "/index.html";
+        }
         else {throw Error(res.status)}
-    })
-
-    // Save session token and naviagte to main page
-    .then(body => {
-        document.cookie = JSON.parse(body).token;
-        location.href = "/index.html";
     })
 
     // Display errors to user
