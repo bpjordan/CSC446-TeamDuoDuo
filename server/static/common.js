@@ -5,14 +5,14 @@ function query() {
     // Request data using session token
     fetch("http://" + parsedUrl.host + "/api/query", {
         method: "GET",
-        headers: {
-            "Authorization": document.cookie,
-        },
         mode: "no-cors"
     })
 
-    // Convert response to text
-    .then((resp) => resp.text())
+    // Check for errors in request
+    .then (res => {
+        if (res.ok) {return res.text()}
+        else {throw Error(res.status)}
+    })
 
     // Display data to user
     .then((data) => {
@@ -20,8 +20,12 @@ function query() {
     })
 
     // Log request errors
-    .catch((err) => {
-        console.log(err);
+    .catch((error) => {
+        if (error.message == 401){
+            alert("Session Expired: You will be redirected to the login page.")
+            document.cookie = ""
+            location.href = "/"
+        }
     })
 }
 
@@ -54,7 +58,6 @@ function login(e) {
 
     // Display errors to user
     .catch((error) => {
-        console.log(error)
         if (error.message == 401) {
             document.getElementById("error").textContent = "Incorrect username or password, please try again.";
         }
