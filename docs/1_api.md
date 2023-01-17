@@ -7,23 +7,34 @@ Returns the web app's frontend.
 
 ## /api
 
-Root directory for all non-html API endpoints.  
+Root directory for all non-html API endpoints.
 
-Note: All APIs will respond with `500 Internal Server Error` if any error occurs.  
+Note: All APIs will respond with `500 Internal Server Error` if any error occurs.
+
+All endpoints besides `/api/login` require a valid authorization token in the request cookies.
+Otherwise, endpoint will return `401 Unauthorized`
 
 ### /api/query (GET)
 
-Queries the database server for all entries in the `users` table.  
-Requires a header with the token provided by `/api/login`.
-Responds with `200 OK` and a JSON string representing the `users` table.
-Request must include a valid authorization token in its cookies,
-otherwise endpoint returns `401 Unauthorized`
+Returns a JSON list of `/api/query/` endpoints the current user is allowed to call.
+Returned names are relative to `/api/query/`. For example: if the user is allowed to
+call `/api/query/users`, the returned list will include `"users"`.
+
+### /api/query/users, /api/query/access_logs, /api/query/pokemon (GET)
+
+Queries the database server for all entries in the `users`, `access_logs`, or `pokemon` tables.
+Responds with `200 OK` and a JSON string representing the requested table.
+
+### /api/query/user (GET)
+
+Returns information about the user making the request.
+Responds with `200 OK` and a JSON string
 
 ### /api/login (POST)
 
-Checks if a user exists in the database with the correct username & password.  
+Checks if a user exists in the database with the correct username & password.
 If login is correct, returns `200 OK` status code and an authorization cookie is added.
-If login is incorrect, returns `401 Unauthorized` status code.  
+If login is incorrect, returns `401 Unauthorized` status code.
 
 Request body should include HTTP form with parameters:
 
