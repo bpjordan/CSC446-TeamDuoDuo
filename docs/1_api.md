@@ -11,13 +11,24 @@ Root directory for all non-html API endpoints.
 
 Note: All APIs will respond with `500 Internal Server Error` if any error occurs.
 
-### /api/query_users, /api/query_access_logs, /api/query_pokemon (GET)
+All endpoints besides `/api/login` require a valid authorization token in the request cookies.
+Otherwise, endpoint will return `401 Unauthorized`
+
+### /api/query (GET)
+
+Returns a JSON list of `/api/query/` endpoints the current user is allowed to call.
+Returned names are relative to `/api/query/`. For example: if the user is allowed to
+call `/api/query/users`, the returned list will include `"users"`.
+
+### /api/query/users, /api/query/access_logs, /api/query/pokemon (GET)
 
 Queries the database server for all entries in the `users`, `access_logs`, or `pokemon` tables.
-Requires a header with the token provided by `/api/login`.
 Responds with `200 OK` and a JSON string representing the requested table.
-Request must include a valid authorization token in its cookies,
-otherwise endpoint returns `401 Unauthorized`
+
+### /api/query/user (GET)
+
+Returns information about the user making the request.
+Responds with `200 OK` and a JSON string
 
 ### /api/login (POST)
 
