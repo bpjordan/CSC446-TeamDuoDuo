@@ -23,10 +23,10 @@ impl FromStr for UserRole {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
+        match s.to_lowercase().as_str() {
             "trainer" => Ok(Self::Trainer),
             "professor" => Ok(Self::Professor),
-            "leader" => Ok(Self::GymLeader),
+            "leader" | "gymleader" | "gym_leader" => Ok(Self::GymLeader),
             _ => Err(())
         }
     }
