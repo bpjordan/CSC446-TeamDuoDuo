@@ -23,13 +23,15 @@ CREATE TABLE pokemon (
     FOREIGN KEY (trainer) REFERENCES users(username)
 );
 
+SET GLOBAL time_zone = 'America/Chicago';
+
 CREATE TABLE access_log (
-    timestamp           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    timestamp           DATETIME DEFAULT CURRENT_TIMESTAMP,
     username_provided   VARCHAR(255) NOT NULL,
     password_provided   CHAR(96) NOT NULL,
     success             BOOLEAN NOT NULL,
     user_found          VARCHAR(255),
-    session_len         INT,
+    session_len         INT UNSIGNED,
     error               VARCHAR(255),
     PRIMARY KEY (timestamp, username_provided),
     FOREIGN KEY (user_found) REFERENCES users(username)

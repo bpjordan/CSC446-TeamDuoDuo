@@ -36,13 +36,13 @@ impl FromRow<'_, MySqlRow> for User {
     }
 }
 
-#[get("/query/users")]
+#[get("/users")]
 pub async fn query_users(_user_session: auth::UserSession ,mut db: Connection<db::Users>) -> Result<Json<Vec<User>>, Status> {
 
-    let users = sqlx::query_as("SELECT * FROM users;")
+    let users = sqlx::query_as("SELECT * FROM users")
     .fetch(&mut *db)
     .try_collect::<Vec<_>>().await
-    .map_err(|_| Status::InternalServerError)?;
+    .or(Err(Status::InternalServerError))?;
 
     Ok(Json(users))
 }

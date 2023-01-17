@@ -6,6 +6,7 @@ use rocket::serde::json::Json;
 use crate::auth;
 
 mod users;
+mod log;
 
 // Endpoint that lists allowed queries for a user
 #[get("/")]
@@ -37,6 +38,10 @@ fn query_unauthorized(_endpoint: String) -> Status {
 pub fn stage() -> AdHoc {
     AdHoc::on_ignite("Query endpoints", |rocket| async {
         rocket
-        .mount("/api/query", routes![query_list, list_unauthenticated, users::query_users, query_forbidden, query_unauthorized])
+        .mount("/api/query", routes![
+            query_list, list_unauthenticated,
+            users::query_users, log::query_logs,
+            query_forbidden, query_unauthorized
+        ])
     })
 }
