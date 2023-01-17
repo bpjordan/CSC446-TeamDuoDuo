@@ -8,8 +8,7 @@
 <head>
     <script type="text/javascript">
         // Redirect to login page if not logged in
-        console.log(document.cookie);
-        if (document.cookie != "session=valid") {
+        if (document.cookie == "session_token=invalid" || document.cookie == '') {
             location.href = "/"
         }
     </script>

@@ -33,7 +33,7 @@ function query() {
         .catch((error) => {
             if (error.message == 401) {
                 alert("Session Expired: You will be redirected to the login page.");
-                document.cookie = "session=invalid";
+                document.cookie = "session_token=invalid";
                 location.href = "/";
             }
         })
@@ -58,7 +58,6 @@ function login(e) {
         // If no errors, navigate to main page
         .then(res => {
             if (res.ok) {
-                document.cookie = "session=valid"
                 location.href = "/index.html";
             }
             else { throw Error(res.status) }
@@ -100,7 +99,7 @@ function getPokemon() {
 };
 
 function logout() {
-    document.cookie = "session=invalid";
+    document.cookie = "session_token=invalid";
     location.href = "/";
 }
 
@@ -134,7 +133,6 @@ function roleColor(role) {
 }
 
 function typeColor(type) {
-    console.log(type);
     if (type == "fire") {
         document.getElementById("pokemon-data-type").style.backgroundColor = '#ff4422';
         document.getElementById("pokemon-data-border").style.borderColor = '#ff4422';
