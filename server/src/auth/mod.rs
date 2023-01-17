@@ -1,5 +1,6 @@
 use argon2::{Argon2, PasswordVerifier, PasswordHash};
 use rand::RngCore;
+use rocket::fairing::AdHoc;
 use rocket::futures::{TryFutureExt, FutureExt};
 use rocket::http::{CookieJar, Status, Cookie};
 use rocket::form::Form;
@@ -12,7 +13,7 @@ use crate::db;
 
 pub use roles::UserSession;
 
-use self::roles::UserRole;
+pub use self::roles::UserRole;
 
 #[derive(Debug, FromForm)]
 pub struct UserCredentials {
@@ -21,7 +22,7 @@ pub struct UserCredentials {
 }
 
 #[post("/login", data="<req_creds>")]
-pub(crate) async fn login_handler(req_creds: Form<UserCredentials>, cookies: &CookieJar<'_>, db_pool: &db::Users) -> Status {
+async fn login_handler(req_creds: Form<UserCredentials>, cookies: &CookieJar<'_>, db_pool: &db::Users) -> Status {
 
     async {
         let query_connection = &mut db_pool.acquire().await?;
@@ -100,4 +101,11 @@ pub(crate) async fn login_handler(req_creds: Form<UserCredentials>, cookies: &Co
     })
 
     .await
+}
+
+// Function called by main to add module to the api
+pub fn stage() -> AdHoc {
+    AdHoc::on_ignite("Auth endpoints", |rocket| async {
+        rocket.mount("/api", routes![login_handler])
+    })
 }
