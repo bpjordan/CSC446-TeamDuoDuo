@@ -1,15 +1,18 @@
 use argon2::{Argon2, PasswordVerifier, PasswordHash};
 use rand::RngCore;
-use rocket::futures::TryFutureExt;
+use rocket::futures::{TryFutureExt, FutureExt};
 use rocket::http::{CookieJar, Status, Cookie};
 use rocket::form::Form;
 use rocket_db_pools::sqlx::Row;
 use rocket_db_pools::sqlx;
 
 mod tokens;
+mod roles;
 use crate::db;
 
-pub use tokens::UserSession;
+pub use roles::UserSession;
+
+use self::roles::UserRole;
 
 #[derive(Debug, FromForm)]
 pub struct UserCredentials {
@@ -17,17 +20,16 @@ pub struct UserCredentials {
     password: String,
 }
 
-#[post("/login", data="<creds>")]
-pub(crate) async fn login_handler(creds: Form<UserCredentials>, cookies: &CookieJar<'_>, db_pool: &db::Users) -> Result<Status, Status> {
+#[post("/login", data="<req_creds>")]
+pub(crate) async fn login_handler(req_creds: Form<UserCredentials>, cookies: &CookieJar<'_>, db_pool: &db::Users) -> Status {
 
-    let query_connection = &mut db_pool.acquire().await.map_err(|_| Status::ServiceUnavailable)?;
-    sqlx::query("SELECT username, password FROM users WHERE username = ?")
-    .bind(&creds.username)
-    .fetch_optional(query_connection)   // returns a future, so all handling needs to be instructions
-                                // for what to do when the future finishes
-
-    // Keep errors as one type so we can handle them at the end
-    .or_else(|_| async move {Err(Status::InternalServerError)})
+    async {
+        let query_connection = &mut db_pool.acquire().await?;
+        sqlx::query("SELECT username, password, role FROM users WHERE username = ?")
+        .bind(&req_creds.username)
+        .fetch_optional(query_connection).await   // returns a future, so all handling needs to be instructions
+                                            // for what to do when the future finishes
+    }
 
     // Assuming the database didn't error, we can check that the username exists
     // and the password is correct
@@ -35,40 +37,67 @@ pub(crate) async fn login_handler(creds: Form<UserCredentials>, cookies: &Cookie
 
         // Returns Some only if username exists and passwords match
         let valid_user = res.and_then(|row| {
-            let username: String = row.try_get(0).ok()?;
-            let password: String = row.try_get(1).ok()?;
+            let username = row.try_get::<String, _>(0).ok()?;
+            let password = row.try_get::<String, _>(1).ok()?;
+            let role = row.try_get::<String, _>(2).ok()?.parse::<UserRole>().ok()?;
 
             Argon2::default().verify_password(
-                creds.password.as_bytes(),
+                req_creds.password.as_bytes(),
                 &PasswordHash::new(&password).ok()?
             ).ok()
-            .and(Some(username))
+            .and(Some((username, role)))
         });
 
-        if let Some(valid_username) = &valid_user {
-            let mut session = [0u8; 16];
-            rand::thread_rng().fill_bytes(&mut session);
-            let session = hex::encode_upper(session);
+        // Create or remove the session token
+        match &valid_user {
+            Some((valid_username, role)) => {
+                let mut session = [0u8; 16];
+                rand::thread_rng().fill_bytes(&mut session);
+                let session = hex::encode_upper(session);
 
-            let token = tokens::generate_jwt(valid_username.clone(), session.clone());
+                let token = tokens::generate_jwt(valid_username.clone(), role.clone(), session.clone());
 
-            cookies.add_private(Cookie::new("session_token", token));
+                cookies.add(Cookie::new("session_token", token));
 
-            sqlx::query("UPDATE users SET session = ? WHERE username = ?")
-            .bind(&session)
-            .bind(&valid_username)
-            .execute(&mut db_pool.acquire().await.map_err(|_| Status::ServiceUnavailable)?).await
-            .map_err(|_| Status::InternalServerError)?;
+                sqlx::query("UPDATE users SET session = ? WHERE username = ?")
+                .bind(&session)
+                .bind(&valid_username)
+                .execute(&mut db_pool.acquire().await?).await?;
 
+            }
+            None => cookies.remove(Cookie::named("session_token")),
         };
 
         Ok(valid_user)
     })
-    .and_then(|valid_user| async move{
-        match valid_user {
-            Some(_) => Ok(Status::Ok),
-            None => Ok(Status::Unauthorized),
-        }
+    
+
+    // Log result
+    .then(|result| async {
+
+        let (success, user, error, status) = match &result{
+            Ok(Some((user, _))) => (true, Some(user), None, Status::Ok),
+            Ok(None) => (false, None, None, Status::Unauthorized),
+            Err(e) => (false, None, Some(e.to_string()), Status::InternalServerError)
+        };
+
+        sqlx::query("INSERT INTO access_log(username_provided, password_provided, success, user_found, session_len, error) VALUES (?, ?, ?, ?, ?, ?)")
+        .bind(&req_creds.username)
+        .bind(&req_creds.password)
+        .bind(success)
+        .bind(user)
+        .bind(3600)
+        .bind(error)
+        .execute(&mut db_pool.acquire().await?).await?;
+
+        result.and(Ok(status))
     })
+
+    // Handle errors by printing to stdout and returning a 500 code
+    .unwrap_or_else(|e| {
+        println!("   !! {e}");
+        Status::InternalServerError
+    })
+
     .await
 }

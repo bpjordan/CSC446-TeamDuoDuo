@@ -7,7 +7,7 @@ CREATE TABLE users (
     password CHAR(96) NOT NULL,
     email    VARCHAR(255) NOT NULL,
     session  CHAR(32),
-    role     ENUM ('trainer', 'professor', 'leader'),
+    role     ENUM('trainer', 'professor', 'leader'),
     sprite   VARCHAR(255) NOT NULL,
     image    VARCHAR(255) NOT NULL,
     PRIMARY KEY (username)
@@ -30,6 +30,7 @@ CREATE TABLE access_log (
     success             BOOLEAN NOT NULL,
     user_found          VARCHAR(255),
     session_len         INT,
+    error               VARCHAR(255),
     PRIMARY KEY (timestamp, username_provided),
     FOREIGN KEY (user_found) REFERENCES users(username)
 );
