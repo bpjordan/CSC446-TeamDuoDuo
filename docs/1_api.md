@@ -25,9 +25,11 @@ call `/api/query/users`, the returned list will include `"users"`.
 Queries the database server for all entries in the `users`, `access_logs`, or `pokemon` tables.
 Responds with `200 OK` and a JSON string representing the requested table.
 
-### /api/query/user (GET)
+Includes an optional `limit=` URL parameter to limit the number of records returned
 
-Returns information about the user making the request.
+### /api/query/user, /api/query/user_pokemon (GET)
+
+Returns information about the user making the request, or their pokemon.
 Responds with `200 OK` and a JSON string
 
 ### /api/login (POST)

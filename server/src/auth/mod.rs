@@ -1,5 +1,8 @@
-use argon2::{Argon2, PasswordVerifier, PasswordHash};
+use argon2::password_hash::SaltString;
+use argon2::{Argon2, PasswordVerifier, PasswordHash, PasswordHasher};
 use rand::RngCore;
+use rand::rngs::OsRng;
+use rocket::fairing::AdHoc;
 use rocket::futures::{TryFutureExt, FutureExt};
 use rocket::http::{CookieJar, Status, Cookie};
 use rocket::form::Form;
@@ -10,9 +13,7 @@ mod tokens;
 mod roles;
 use crate::db;
 
-pub use roles::UserSession;
-
-use self::roles::UserRole;
+pub use roles::{UserSession, UserRole, TrainerSession, ProfessorSession, GymLeaderSession};
 
 #[derive(Debug, FromForm)]
 pub struct UserCredentials {
@@ -21,7 +22,7 @@ pub struct UserCredentials {
 }
 
 #[post("/login", data="<req_creds>")]
-pub(crate) async fn login_handler(req_creds: Form<UserCredentials>, cookies: &CookieJar<'_>, db_pool: &db::Users) -> Status {
+async fn login_handler(req_creds: Form<UserCredentials>, cookies: &CookieJar<'_>, db_pool: &db::Users) -> Status {
 
     async {
         let query_connection = &mut db_pool.acquire().await?;
@@ -75,6 +76,10 @@ pub(crate) async fn login_handler(req_creds: Form<UserCredentials>, cookies: &Co
     // Log result
     .then(|result| async {
 
+        let salt = SaltString::generate(&mut OsRng);
+        let pw_hash = Argon2::default().hash_password(&req_creds.password.as_bytes(), &salt)
+            .map_or("error hashing password".into(), |h| h.to_string());
+
         let (success, user, error, status) = match &result{
             Ok(Some((user, _))) => (true, Some(user), None, Status::Ok),
             Ok(None) => (false, None, None, Status::Unauthorized),
@@ -83,7 +88,7 @@ pub(crate) async fn login_handler(req_creds: Form<UserCredentials>, cookies: &Co
 
         sqlx::query("INSERT INTO access_log(username_provided, password_provided, success, user_found, session_len, error) VALUES (?, ?, ?, ?, ?, ?)")
         .bind(&req_creds.username)
-        .bind(&req_creds.password)
+        .bind(pw_hash)
         .bind(success)
         .bind(user)
         .bind(3600)
@@ -100,4 +105,11 @@ pub(crate) async fn login_handler(req_creds: Form<UserCredentials>, cookies: &Co
     })
 
     .await
+}
+
+// Function called by main to add module to the api
+pub fn stage() -> AdHoc {
+    AdHoc::on_ignite("Auth endpoints", |rocket| async {
+        rocket.mount("/api", routes![login_handler])
+    })
 }

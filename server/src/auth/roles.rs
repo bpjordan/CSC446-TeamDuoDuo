@@ -1,18 +1,21 @@
 
 use std::str::FromStr;
 
-use rocket::outcome::IntoOutcome;
+use rocket::http::Status;
+use rocket::outcome::{IntoOutcome};
 use rocket::request::Outcome;
 use rocket::{request::FromRequest, Request};
 use rocket::serde::{Serialize, Deserialize};
 use rocket_db_pools::Connection;
+use sqlx::Type;
 
 use crate::db;
 
 use super::tokens;
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, Type, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(crate = "rocket::serde")]
+#[repr(u64)] // We have to do some weird hacky garbage to make sqlx cooperate with this being an enum
 pub enum UserRole {
     Trainer,
     Professor,
@@ -42,18 +45,25 @@ pub struct UserSession {
     pub role: UserRole,
 }
 
+// Instructions for how to get the user's session data from a request
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for UserSession {
     type Error = ();
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
 
-        let conn = req.guard::<Connection<db::Users>>().await.unwrap();
+        let conn = req.guard::<Connection<db::Users>>().await;
+
+        let conn = match conn {
+            Outcome::Success(c) => c,
+            _ => return Outcome::Failure((Status::InternalServerError, ()))
+        };
 
         let claims = req.cookies()
             .get("session_token")
             .and_then(|c| tokens::parse_jwt(c.value()))
             .and_then(|t| Some(t.claims));
+
 
         let valid = match &claims {
             Some(c) => tokens::is_valid(c, conn).await,
@@ -64,5 +74,52 @@ impl<'r> FromRequest<'r> for UserSession {
             .filter(|_| valid)
             .or_forward(())
 
+    }
+}
+
+// Simple wrapper structs on a user session that first checks if the user has the appropriate permissions
+pub struct TrainerSession(UserSession);
+pub struct ProfessorSession(UserSession);
+pub struct GymLeaderSession(UserSession);
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for TrainerSession {
+    type Error = ();
+
+    async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        match req.guard::<UserSession>().await {
+            Outcome::Success(s) if s.role >= UserRole::Trainer => Outcome::Success(Self(s)),
+            Outcome::Success(_) => Outcome::Failure((Status::Forbidden, ())),
+            Outcome::Forward(e) => Outcome::Forward(e),
+            Outcome::Failure(e) => Outcome::Failure(e),
+        }
+    }
+}
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for ProfessorSession {
+    type Error = ();
+
+    async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        match req.guard::<UserSession>().await {
+            Outcome::Success(s) if s.role >= UserRole::Professor => Outcome::Success(Self(s)),
+            Outcome::Success(_) => Outcome::Failure((Status::Forbidden, ())),
+            Outcome::Forward(e) => Outcome::Forward(e),
+            Outcome::Failure(e) => Outcome::Failure(e),
+        }
+    }
+}
+
+#[rocket::async_trait]
+impl<'r> FromRequest<'r> for GymLeaderSession {
+    type Error = ();
+
+    async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
+        match req.guard::<UserSession>().await {
+            Outcome::Success(s) if s.role >= UserRole::GymLeader => Outcome::Success(Self(s)),
+            Outcome::Success(_) => Outcome::Failure((Status::Forbidden, ())),
+            Outcome::Forward(e) => Outcome::Forward(e),
+            Outcome::Failure(e) => Outcome::Failure(e),
+        }
     }
 }

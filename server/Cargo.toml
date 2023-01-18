@@ -14,3 +14,4 @@ hex = "0.4.3"
 hmac = "0.12.1"
 sha2 = "0.10.6"
 jsonwebtoken = "8.2.0"
+sqlx = { version = "0.5", features = ["chrono", "offline", "json", "time"] }
