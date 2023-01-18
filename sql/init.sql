@@ -24,6 +24,7 @@ CREATE TABLE pokemon (
 );
 
 CREATE TABLE access_log (
+    id                  BIGINT NOT NULL AUTO_INCREMENT,
     timestamp           DATETIME DEFAULT CURRENT_TIMESTAMP,
     username_provided   VARCHAR(255) NOT NULL,
     password_provided   CHAR(96) NOT NULL,
@@ -31,7 +32,7 @@ CREATE TABLE access_log (
     user_found          VARCHAR(255),
     session_len         INT UNSIGNED,
     error               VARCHAR(255),
-    PRIMARY KEY (timestamp, username_provided),
+    PRIMARY KEY (id),
     FOREIGN KEY (user_found) REFERENCES users(username)
 );
 
