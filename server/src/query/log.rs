@@ -35,7 +35,7 @@ where
 
 
 #[get("/logs?<last>")]
-pub async fn query_logs (last: Option<u64>, _s: auth::LeaderSession, mut db: Connection<db::Users>)
+pub async fn query_logs (last: Option<u64>, _s: auth::GymLeaderSession, mut db: Connection<db::Users>)
 -> Result<Json<Vec<LogEntry>>, Status> {
 
 

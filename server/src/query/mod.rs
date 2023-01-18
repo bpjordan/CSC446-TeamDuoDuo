@@ -15,7 +15,7 @@ async fn query_list(user_session: auth::UserSession) -> Json<Vec<&'static str>> 
     let allowed_endpoints = match user_session.role {
         auth::UserRole::Trainer => vec!["user, user_pokemon"],
         auth::UserRole::Professor => vec!["user, user_pokemon, pokemon"],
-        auth::UserRole::Leader => vec!["user", "user_pokemon", "pokemon",
+        auth::UserRole::GymLeader => vec!["user", "user_pokemon", "pokemon",
                                         "users", "access_log"],
     };
 
@@ -30,7 +30,7 @@ fn list_unauthenticated() -> Status {
 
 // Fallback endpoint that responds to any queries that aren't allowed for an authenticated user
 #[get("/<_endpoint>", rank = 2)]
-fn query_forbidden(_endpoint: String, _user_session: auth::UserSession) -> Status {
+fn _query_forbidden(_endpoint: String, _user_session: auth::UserSession) -> Status {
     Status::Forbidden
 }
 
@@ -49,7 +49,7 @@ pub fn stage() -> AdHoc {
             users::query_users, users::query_current_user,
             pokemon::query_pokemon, pokemon::query_user_pokemon,
             log::query_logs,
-            query_forbidden, query_unauthorized
+            query_unauthorized
         ])
     })
 }

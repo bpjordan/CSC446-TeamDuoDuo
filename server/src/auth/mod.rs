@@ -13,7 +13,7 @@ mod tokens;
 mod roles;
 use crate::db;
 
-pub use roles::{UserSession, UserRole, TrainerSession, ProfessorSession, LeaderSession};
+pub use roles::{UserSession, UserRole, TrainerSession, ProfessorSession, GymLeaderSession};
 
 #[derive(Debug, FromForm)]
 pub struct UserCredentials {

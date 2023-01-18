@@ -19,7 +19,7 @@ use super::tokens;
 pub enum UserRole {
     Trainer,
     Professor,
-    Leader,
+    GymLeader,
 }
 
 impl FromStr for UserRole {
@@ -29,7 +29,7 @@ impl FromStr for UserRole {
         match s.to_lowercase().as_str() {
             "trainer" => Ok(Self::Trainer),
             "professor" => Ok(Self::Professor),
-            "leader" | "gymleader" | "gym_leader" => Ok(Self::Leader),
+            "leader" | "gymleader" | "gym_leader" => Ok(Self::GymLeader),
             _ => Err(())
         }
     }
@@ -80,7 +80,7 @@ impl<'r> FromRequest<'r> for UserSession {
 // Simple wrapper structs on a user session that first checks if the user has the appropriate permissions
 pub struct TrainerSession(UserSession);
 pub struct ProfessorSession(UserSession);
-pub struct LeaderSession(UserSession);
+pub struct GymLeaderSession(UserSession);
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for TrainerSession {
@@ -111,12 +111,12 @@ impl<'r> FromRequest<'r> for ProfessorSession {
 }
 
 #[rocket::async_trait]
-impl<'r> FromRequest<'r> for LeaderSession {
+impl<'r> FromRequest<'r> for GymLeaderSession {
     type Error = ();
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         match req.guard::<UserSession>().await {
-            Outcome::Success(s) if s.role >= UserRole::Leader => Outcome::Success(Self(s)),
+            Outcome::Success(s) if s.role >= UserRole::GymLeader => Outcome::Success(Self(s)),
             Outcome::Success(_) => Outcome::Failure((Status::Forbidden, ())),
             Outcome::Forward(e) => Outcome::Forward(e),
             Outcome::Failure(e) => Outcome::Failure(e),
