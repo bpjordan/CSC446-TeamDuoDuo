@@ -21,6 +21,7 @@ services:
       - MYSQLHOST=mysql
       - MYSQLUSER=root
       - MYSQLPASS=example
+      - TZ=America/Chicago
     volumes:
       - ./server/static:/app/static
     ports:

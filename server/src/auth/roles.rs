@@ -6,17 +6,19 @@ use rocket::request::Outcome;
 use rocket::{request::FromRequest, Request};
 use rocket::serde::{Serialize, Deserialize};
 use rocket_db_pools::Connection;
+use sqlx::Type;
 
 use crate::db;
 
 use super::tokens;
 
-#[derive(Debug, Serialize, Deserialize, Clone, Copy)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, Type)]
 #[serde(crate = "rocket::serde")]
+#[sqlx(rename_all = "lowercase")]
 pub enum UserRole {
     Trainer,
     Professor,
-    GymLeader,
+    Leader,
 }
 
 impl FromStr for UserRole {
@@ -26,7 +28,7 @@ impl FromStr for UserRole {
         match s.to_lowercase().as_str() {
             "trainer" => Ok(Self::Trainer),
             "professor" => Ok(Self::Professor),
-            "leader" | "gymleader" | "gym_leader" => Ok(Self::GymLeader),
+            "leader" | "gymleader" | "gym_leader" => Ok(Self::Leader),
             _ => Err(())
         }
     }
