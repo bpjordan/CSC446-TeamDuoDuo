@@ -14,7 +14,7 @@ use super::tokens;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, Type)]
 #[serde(crate = "rocket::serde")]
-#[sqlx(rename_all = "lowercase")]
+#[repr(u64)] // We have to do some weird hacky garbage to make sqlx cooperate with this being an enum
 pub enum UserRole {
     Trainer,
     Professor,

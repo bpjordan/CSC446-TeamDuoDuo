@@ -1,5 +1,7 @@
-use argon2::{Argon2, PasswordVerifier, PasswordHash};
+use argon2::password_hash::SaltString;
+use argon2::{Argon2, PasswordVerifier, PasswordHash, PasswordHasher};
 use rand::RngCore;
+use rand::rngs::OsRng;
 use rocket::fairing::AdHoc;
 use rocket::futures::{TryFutureExt, FutureExt};
 use rocket::http::{CookieJar, Status, Cookie};
@@ -76,6 +78,10 @@ async fn login_handler(req_creds: Form<UserCredentials>, cookies: &CookieJar<'_>
     // Log result
     .then(|result| async {
 
+        let salt = SaltString::generate(&mut OsRng);
+        let pw_hash = Argon2::default().hash_password(&req_creds.password.as_bytes(), &salt)
+            .map_or("error hashing password".into(), |h| h.to_string());
+
         let (success, user, error, status) = match &result{
             Ok(Some((user, _))) => (true, Some(user), None, Status::Ok),
             Ok(None) => (false, None, None, Status::Unauthorized),
@@ -84,7 +90,7 @@ async fn login_handler(req_creds: Form<UserCredentials>, cookies: &CookieJar<'_>
 
         sqlx::query("INSERT INTO access_log(username_provided, password_provided, success, user_found, session_len, error) VALUES (?, ?, ?, ?, ?, ?)")
         .bind(&req_creds.username)
-        .bind(&req_creds.password)
+        .bind(pw_hash)
         .bind(success)
         .bind(user)
         .bind(3600)

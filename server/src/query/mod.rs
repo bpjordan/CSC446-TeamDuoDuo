@@ -7,11 +7,17 @@ use crate::auth;
 
 mod users;
 mod log;
+mod pokemon;
 
 // Endpoint that lists allowed queries for a user
 #[get("/")]
-async fn query_list(_user_session: auth::UserSession) -> Json<Vec<&'static str>> {
-    let allowed_endpoints = vec!["users"];
+async fn query_list(user_session: auth::UserSession) -> Json<Vec<&'static str>> {
+    let allowed_endpoints = match user_session.role {
+        auth::UserRole::Trainer => vec!["user, user_pokemon"],
+        auth::UserRole::Professor => vec!["user, user_pokemon, pokemon"],
+        auth::UserRole::Leader => vec!["user", "user_pokemon", "pokemon",
+                                        "users", "access_log"],
+    };
 
     Json(allowed_endpoints)
 }
@@ -40,7 +46,9 @@ pub fn stage() -> AdHoc {
         rocket
         .mount("/api/query", routes![
             query_list, list_unauthenticated,
-            users::query_users, log::query_logs,
+            users::query_users, users::query_current_user,
+            pokemon::query_pokemon, pokemon::query_user_pokemon,
+            log::query_logs,
             query_forbidden, query_unauthorized
         ])
     })

@@ -7,7 +7,7 @@ CREATE TABLE users (
     password CHAR(96) NOT NULL,
     email    VARCHAR(255) NOT NULL,
     session  CHAR(32),
-    role     ENUM('trainer', 'professor', 'leader'),
+    role     ENUM ('trainer', 'professor', 'leader'),
     sprite   VARCHAR(255) NOT NULL,
     image    VARCHAR(255) NOT NULL,
     PRIMARY KEY (username)
@@ -40,7 +40,7 @@ VALUES(
     "brendan",
     "$argon2id$v=19$m=4096,t=3,p=1$UmRxb2ZHQmV2cDBQUG1odw$ZvpuZy/7QJ9aZnx1cbwitw",
     "brendan@example.com",
-    "trainer",
+    'trainer',
     "https://media.pokemoncentral.it/wiki/c/c9/RFVF_Rosso.png",
     "https://media.pokemoncentral.it/wiki/b/be/RossoRFVF.png"
 ),
@@ -48,7 +48,7 @@ VALUES(
     "bronson",
     "$argon2id$v=19$m=4096,t=3,p=1$UmRxb2ZHQmV2cDBQUG1odw$puIZlAash2vZjfDOXuVfFA",
     "bronson@example.com",
-    "trainer",
+    'trainer',
     "https://media.pokemoncentral.it/wiki/c/c9/RFVF_Rosso.png",
     "https://media.pokemoncentral.it/wiki/b/be/RossoRFVF.png"
 ),
@@ -56,7 +56,7 @@ VALUES(
     "sydney",
     "$argon2id$v=19$m=4096,t=3,p=1$UmRxb2ZHQmV2cDBQUG1odw$puIZlAash2vZjfDOXuVfFA",
     "sydney@example.com",
-    "trainer",
+    'trainer',
     "https://media.pokemoncentral.it/wiki/a/af/RFVF_Leaf.png",
     "https://media.pokemoncentral.it/wiki/3/3b/Leaf_RFVF.png"
 ),
@@ -64,7 +64,7 @@ VALUES(
     "promyse",
     "$argon2id$v=19$m=4096,t=3,p=1$UmRxb2ZHQmV2cDBQUG1odw$pXvskGPmY0HSLy1dpADpFw",
     "promyse@example.com",
-    "trainer",
+    'trainer',
     "https://media.pokemoncentral.it/wiki/a/af/RFVF_Leaf.png",
     "https://media.pokemoncentral.it/wiki/3/3b/Leaf_RFVF.png"
 ),
@@ -72,7 +72,7 @@ VALUES(
     "oak",
     "$argon2id$v=19$m=4096,t=3,p=1$SXRKeHRpOUNpU3QzMzdhWg$ruktCWzheUfFpfSDKPkyjQ", /* research */
     "oak@example.com",
-    "professor",
+    'professor',
     "https://media.pokemoncentral.it/wiki/4/49/RFVF_Oak.png",
     "https://media.pokemoncentral.it/wiki/d/d0/OakLGPE.png"
 ),
@@ -80,7 +80,7 @@ VALUES(
     "brock",
     "$argon2id$v=19$m=4096,t=3,p=1$ZXhWaWM0TVRhOUhNakE4Nw$etnc2G9SKIvShFCYv6xlHg", /* rock */
     "brock@example.com",
-    "leader",
+    'leader',
     "https://media.pokemoncentral.it/wiki/9/92/RFVF_Brock.png",
     "https://media.pokemoncentral.it/wiki/4/4b/BrockLGPE.png"
 ),
@@ -88,7 +88,7 @@ VALUES(
     "misty",
     "$argon2id$v=19$m=4096,t=3,p=1$eXlNdlg3eG1wWEI2U0czcg$xmmnQmuBUsPdfGQrGwkM9Q", /* water */
     "misty@example.com",
-    "leader",
+    'leader',
     "https://media.pokemoncentral.it/wiki/0/0e/RFVF_Misty.png",
     "https://media.pokemoncentral.it/wiki/3/3d/MistyLGPE.png"
 );

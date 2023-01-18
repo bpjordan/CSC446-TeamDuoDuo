@@ -24,7 +24,6 @@ pub struct LogEntry {
 }
 
 // Helper function to serialize the datetime
-// grabbed from https://www.park-dev.io/serializing-a-chronodatetime-using-serde
 pub fn serialize_dt<S>(dt: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
@@ -35,11 +34,13 @@ where
 }
 
 
-#[get("/logs")]
-pub async fn query_logs (_user_session: auth::UserSession, mut db: Connection<db::Users>)
+#[get("/logs?<last>")]
+pub async fn query_logs (last: Option<u64>, _user_session: auth::UserSession, mut db: Connection<db::Users>)
 -> Result<Json<Vec<LogEntry>>, Status> {
 
-    let logs = sqlx::query_as("SELECT * FROM access_log")
+
+    let logs = sqlx::query_as("SELECT * FROM access_log ORDER BY timestamp LIMIT ?")
+    .bind(last.unwrap_or(std::u64::MAX))
     .fetch(&mut *db)
     .try_collect::<Vec<_>>()
     .or_else(|e| async move {

@@ -20,15 +20,28 @@ pub struct User {
     pub email: String,
     pub role: auth::UserRole,
     pub session: Option<String>,
+    pub sprite: String,
+    pub image: String,
 }
 
 #[get("/users")]
 pub async fn query_users(_user_session: auth::UserSession ,mut db: Connection<db::Users>) -> Result<Json<Vec<User>>, Status> {
 
-    let users = sqlx::query_as("SELECT * FROM users")
+    // Incredibly stupid hacky workaround because Rocket uses an old version of sqlx
+    let users = sqlx::query_as(" SELECT users.*, CAST(role AS UNSIGNED)-1 AS role FROM users ")
     .fetch(&mut *db)
     .try_collect::<Vec<_>>().await
-    .or(Err(Status::InternalServerError))?;
+    .or_else(|e| {
+        println!("   !! Got error {e}");
+        Err(Status::InternalServerError)
+    })?;
 
     Ok(Json(users))
+}
+
+
+#[get("/user")]
+pub async fn query_current_user(_user_session: auth::UserSession, _db: Connection<db::Users>) -> Result<Json<User>, Status> {
+
+    Err(Status::NotImplemented)
 }
