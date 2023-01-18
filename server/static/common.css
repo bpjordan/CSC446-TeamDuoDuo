@@ -77,13 +77,19 @@ label {
 }
 
 .box-area-pokemon,
-.box-area-users {
+.box-area-users,
+.box-area-logs {
     border-style: inset;
     border-radius: 5px;
     overflow-y: scroll;
     height: 450px;
     text-align: left;
     width: 450px;
+}
+
+.box-area-logs{
+    overflow-wrap: break-word;
+    display:inline-block;
 }
 
 .box-area-pokemon img {

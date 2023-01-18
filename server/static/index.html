@@ -22,51 +22,59 @@
         <div style="margin-bottom: -20px;">Logged into</div>
         <h1>Bronson's PC</h1>
         <div class="line-divider" style="margin-bottom: 10px;margin-top: -50px;"></div>
-        <button class="button-large" onclick="getPokemon()">Pokemon</button>
-        <button class="button-large" onclick="getUsers()">Users</button>
-        <button class="button-large" onclick="getLogs()">Logs</button>
+        <button class="button-large" onclick="getData('/user_pokemon')">Pokemon</button>
+        <button class="button-large" onclick="getData('/user')">User</button>
+        <button class="button-large" onclick="getData('/access_log')">Logs</button>
         <div class="error" id="error" style="margin-top: 10px;"></div>
         <div class="line-divider" style="margin-top: 10px;"></div>
         <div class="data-area" id="pokemon">
             <div class="data">
                 <h2>P<sub>K</sub>M<sub>N</sub> DATA</h2>
-                    <div id="pokemon-data-border" style="width: 350px;height:350px;border-style:inset;border-color:#ffdd00;border-radius: 5px;border-width: 7px;">
-                        <img id="pokemon-data-image" loading="eager" style="height: 100%;width: 100%;object-fit: contain;background-color: white;"
-                        src="https://img.pokemondb.net/artwork/avif/electabuzz.avif" 
-                        alt="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Forig00.deviantart.net%2F0945%2Ff%2F2011%2F237%2F0%2F8%2Fwho__s_that_pokemon__by_amitlu89-d47rmjf.png&f=1&nofb=1&ipt=2d149387fb25861c2160c4039075c064bab18fbe95ce31bd5e71647e6da51267&ipo=images"/>
-                    </div>
-                    <p id="pokemon-data-name" style="font-size:30px;margin-top:5px;margin-bottom:-10px;">ELECTABUZZ</p>
+                <div id="pokemon-data-border"
+                    style="width: 350px;height:350px;border-style:inset;border-color:#ffdd00;border-radius: 5px;border-width: 7px;">
+                    <img id="pokemon-data-image" loading="eager"
+                        style="height: 100%;width: 100%;object-fit: contain;background-color: white;"
+                        src="https://img.pokemondb.net/artwork/avif/electabuzz.avif"
+                        alt="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Forig00.deviantart.net%2F0945%2Ff%2F2011%2F237%2F0%2F8%2Fwho__s_that_pokemon__by_amitlu89-d47rmjf.png&f=1&nofb=1&ipt=2d149387fb25861c2160c4039075c064bab18fbe95ce31bd5e71647e6da51267&ipo=images" />
+                </div>
+                <p id="pokemon-data-name" style="font-size:30px;margin-top:5px;margin-bottom:-10px;">ELECTABUZZ</p>
                 <p class="type" id="pokemon-data-type">ELECTRIC</p>
             </div>
             <div class="box">
                 <h2>BOX 1</h2>
-                <div class="box-area-pokemon">
-                    <img class="sprite" src="https://img.pokemondb.net/sprites/black-white/normal/electabuzz.png" data-name="electabuzz" data-type="electric" data-image="https://img.pokemondb.net/artwork/large/electabuzz.jpg" onclick="updatePokemonData(event)"/>
-                    <img class="sprite" src="https://img.pokemondb.net/sprites/black-white/normal/chimchar.png" data-name="chimchar" data-type="fire" data-image="https://img.pokemondb.net/artwork/large/chimchar.jpg" onclick="updatePokemonData(event)"/>
-                    <img class="sprite" src="https://img.pokemondb.net/sprites/black-white/normal/magmar.png" data-name="magmar" data-type="fire" data-image="https://img.pokemondb.net/artwork/large/magmar.jpg" onclick="updatePokemonData(event)"/>
-                    <img class="sprite" src="https://img.pokemondb.net/sprites/black-white/normal/gyarados-f.png" data-name="gyarados" data-type="water" data-image="https://img.pokemondb.net/artwork/avif/gyarados.avif" onclick="updatePokemonData(event)"/>
-                </div>
+                <div class="box-area-pokemon" id="box-area-pokemon"></div>
+                <button class="button-large" style="margin-top: 10px;" onclick="getData('/pokemon')">View All</button>
             </div>
         </div>
         <div class="data-area" id="users" style="display: none;">
             <div class="data">
                 <h2>U<sub>S</sub>E<sub>R</sub> DATA</h2>
-                <div id="user-data-border" style="width: 350px;height:350px;border-style:inset;border-color:#ff0000;border-radius: 5px;border-width: 7px;">
-                    <img id="user-data-image" style="height: 100%;width: 100%;object-fit: contain;background-color: white;"
-                    src="https://cdn.staticneo.com/w/pokemon/thumb/8/83/FireRed_LeafGreen_Red.png/300px-FireRed_LeafGreen_Red.png" />
+                <div id="user-data-border"
+                    style="width: 350px;height:350px;border-style:inset;border-color:#ff0000;border-radius: 5px;border-width: 7px;">
+                    <img id="user-data-image"
+                        style="height: 100%;width: 100%;object-fit: contain;background-color: white;"
+                        src="https://cdn.staticneo.com/w/pokemon/thumb/8/83/FireRed_LeafGreen_Red.png/300px-FireRed_LeafGreen_Red.png" />
                 </div>
                 <p id="user-data-name" style="font-size:30px;margin-top:5px;margin-bottom:-10px;">BRONSON</p>
                 <p class="type" id="user-data-role" style="background-color: rgb(175, 10, 10);">TRAINER</p>
             </div>
             <div class="box">
                 <h2>BOX 1</h2>
-                <div class="box-area-users" id="box-area-users">
-                </div>
+                <div class="box-area-users" id="box-area-users"></div>
+                <button class="button-large" style="margin-top: 10px;" onclick="getData('/users')">View All</button>
+            </div>
+        </div>
+        <div class="data-area" id="logs" style="display: none;">
+            <div style="width: 850px;">
+                <h2>L<sub>O</sub>G DATA</h2>
+                <div class="box-area-logs" id="box-area-logs"></div>
             </div>
         </div>
         <button style="margin-top: 50px;" class="button-small" onclick="logout()">Log Out</button>
         <script type="text/javascript">
-            getPokemon();
+            // Get user data
+            getData('/user');
+            getData('/user_pokemon');
         </script>
     </div>
 </body>
