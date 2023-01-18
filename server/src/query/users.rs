@@ -25,7 +25,7 @@ pub struct User {
 }
 
 #[get("/users")]
-pub async fn query_users(_user_session: auth::UserSession ,mut db: Connection<db::Users>) -> Result<Json<Vec<User>>, Status> {
+pub async fn query_users(_s: auth::LeaderSession ,mut db: Connection<db::Users>) -> Result<Json<Vec<User>>, Status> {
 
     // Incredibly stupid hacky workaround because Rocket uses an old version of sqlx
     let users = sqlx::query_as(" SELECT users.*, CAST(role AS UNSIGNED)-1 AS role FROM users ")
