@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <html>
-<link rel="shortcut icon" type="image/x-icon" href="duoduo.png">
+<link rel="shortcut icon" type="image/x-icon" href="favicon.png">
 <link type="text/css" rel="stylesheet" href="common.css">
 <script type="text/javascript" src="common.js"></script>
 
@@ -13,7 +13,9 @@
 
 <body>
     <form class="content" id="loginForm">
+        <img class="login-image" loading="eager" src="doduo-login.png"></img>
         <h1>Welcome to DuoDuo</h1>
+        <div class="line-divider" style="margin-bottom: 10px;margin-top: -60px;"></div>
         <h3>Login to your PC Box:</h3>
         <label for="username">Username</label>
         <input name="username" type="text" id="username">
@@ -21,7 +23,7 @@
         <label for="password">Password</label>
         <input name="password" type="password" id="password">
         <p></p>
-        <button class="button" onclick="login(event)">Login</button>
+        <button class="button-small" onclick="login(event)">Login</button>
         <p class="error" id="error"></p>
     </form>
 </body>

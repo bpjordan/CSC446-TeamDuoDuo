@@ -1,24 +1,77 @@
 <!DOCTYPE html>
 
 <html>
-    <link rel="shortcut icon" type="image/x-icon" href="duoduo.png">
-	<link type="text/css" rel="stylesheet" href="common.css">
-	<script type="text/javascript" src="common.js"></script>
-    <head>
-        <script type="text/javascript">
-            if (document.cookie == ""){
-                location.href = "/"}
-            </script>
-        <title>
-            DuoDuo
-        </title>
-    </head>
+<link rel="shortcut icon" type="image/x-icon" href="favicon.png">
+<link type="text/css" rel="stylesheet" href="common.css">
+<script type="text/javascript" src="common.js"></script>
 
-    <body>
-        <div class="content">
-            <button class="button" onclick="query()" style="font-size: 20px;">Query</button>
-            <p></p>
-            <textarea id="response" rows="20" cols="45" placeholder="Database Results"></textarea>
+<head>
+    <script type="text/javascript">
+        // Redirect to login page if not logged in
+        if (document.cookie == "session_token=invalid" || document.cookie == '') {
+            location.href = "/"
+        }
+    </script>
+    <title>
+        DuoDuo
+    </title>
+</head>
+
+<body>
+    <div class="content">
+        <div style="margin-bottom: -20px;">Logged into</div>
+        <h1 id="user-pc">Nobody's PC</h1>
+        <div class="line-divider" style="margin-bottom: 10px;margin-top: -50px;"></div>
+        <button class="button-large" onclick="getData('/user_pokemon')">Pokemon</button>
+        <button class="button-large" onclick="getData('/user')">Users</button>
+        <button class="button-large" onclick="getData('/access_log')">Logs</button>
+        <div class="error" id="error" style="margin-top: 10px;"></div>
+        <div class="line-divider" style="margin-top: 10px;"></div>
+        <div class="data-area" id="pokemon">
+            <div class="data">
+                <h2>P<sub>K</sub>M<sub>N</sub> DATA</h2>
+                <div class="data-image-box" id="pokemon-data-border">
+                    <img class="data-image" id="pokemon-data-image" loading="eager"
+                        src="https://cdn.drawception.com/images/panels/2012/3-29/mdsLh1XtRB-2.png"/>
+                </div>
+                <p id="pokemon-data-name" style="font-size:30px;margin-top:5px;margin-bottom:-10px;">NO POKEMON</p>
+                <p class="type" id="pokemon-data-type">SAD ;(</p>
+            </div>
+            <div class="box">
+                <h2>BOX 1</h2>
+                <div class="box-area-pokemon" id="box-area-pokemon"></div>
+                <button class="button-large" style="margin-top: 10px;" onclick="getData('/pokemon')">View All</button>
+            </div>
         </div>
-    </body>
+        <div class="data-area" id="users" style="display: none;">
+            <div class="data">
+                <h2>U<sub>S</sub>E<sub>R</sub> DATA</h2>
+                <div class="data-image-box" id="user-data-border">
+                    <img class="data-image" id="user-data-image"
+                        src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fres.cloudinary.com%2Fteepublic%2Fimage%2Fprivate%2Fs--4Tuc7td2--%2Fc_crop%2Cx_10%2Cy_10%2Fc_fit%2Ch_1273%2Fc_crop%2Cg_north_west%2Ch_1260%2Cw_1260%2Cx_6%2Cy_6%2Fco_rgb%3Afffffe%2Ce_colorize%2Cu_Misc%3AOne%2520Pixel%2520Gray%2Fc_scale%2Cg_north_west%2Ch_1260%2Cw_1260%2Ffl_layer_apply%2Cg_north_west%2Cx_0%2Cy_0%2Fbo_0px_solid_white%2Ft_Resized%2520Artwork%2Fc_fit%2Cg_north_west%2Ch_1054%2Cw_1054%2Fco_ffffff%2Ce_outline%3A53%2Fco_ffffff%2Ce_outline%3Ainner_fill%3A53%2Fco_bbbbbb%2Ce_outline%3A3%3A1000%2Fc_mpad%2Cg_center%2Ch_1260%2Cw_1260%2Fb_rgb%3Aeeeeee%2Fc_limit%2Cf_jpg%2Ch_630%2Cq_90%2Cw_630%2Fv1574646088%2Fproduction%2Fdesigns%2F6877529_0.jpg&f=1&nofb=1&ipt=c80ec2d2e82b2725e4e1818cb68b22f9425353d901bde1de2ab9959b9712578a&ipo=images" />
+                </div>
+                <p id="user-data-name" style="font-size:30px;margin-top:5px;margin-bottom:-10px;">NO USER</p>
+                <p class="type" id="user-data-role">WHO EVEN ARE YOU</p>
+            </div>
+            <div class="box">
+                <h2>BOX 1</h2>
+                <div class="box-area-users" id="box-area-users"></div>
+                <button class="button-large" style="margin-top: 10px;" onclick="getData('/users')">View All</button>
+            </div>
+        </div>
+        <div class="data-area" id="logs" style="display: none;">
+            <div style="width: 850px;">
+                <h2>L<sub>O</sub>G DATA</h2>
+                <div class="box-area-logs" id="box-area-logs"></div>
+            </div>
+        </div>
+        <button class="button-small" style="margin-top: 50px;" onclick="logout()">Log Out</button>
+        <script type="text/javascript">
+            // Get user data
+            getData('/user');
+            getData('/user_pokemon');
+        </script>
+    </div>
+</body>
+
 </html>
