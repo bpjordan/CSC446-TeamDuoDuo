@@ -47,7 +47,7 @@ function query(type) {
             if (res.ok) {
 
                 // If logs, convert response into text
-                if (type == "/logs") {
+                if (type == "/access_logs") {
                     return res.text();
                 }
 
@@ -61,17 +61,15 @@ function query(type) {
 
         // Check type to determine data logic
         .then((data) => {
-
             // If user request, add sprite to box
             if (type == "/user") {
-                
                 // Create user sprite
                 var image = '<img \
                     class="sprite" \
-                    src="' + data[0]['sprite'] + '" \
-                    data-name="' + data[0]['username'] + '" \
-                    data-role="' + data[0]['role'] + '" \
-                    data-image="' + data[0]['image'] + '" \
+                    src="' + data['sprite'] + '" \
+                    data-name="' + data['username'] + '" \
+                    data-role="' + data['role'] + '" \
+                    data-image="' + data['image'] + '" \
                     onclick="updateUserData(event)"/>';
 
                 // Add user sprite to box
@@ -81,7 +79,7 @@ function query(type) {
                 document.getElementById('box-area-users').firstChild.click();
 
                 // Update page to display user's name
-                document.getElementById("user-pc").innerHTML=data[0]['username'].toUpperCase() + "'s PC";
+                document.getElementById("user-pc").innerHTML=data['username'].toUpperCase() + "'s PC";
             }
 
             // If users request, add sprites to box
@@ -113,7 +111,7 @@ function query(type) {
                 var image = '<img \
                     class="sprite" \
                     src="' + data[0]['sprite'] + '" \
-                    data-name="' + data[0]['username'] + '" \
+                    data-name="' + data[0]['name'] + '" \
                     data-type="' + data[0]['type'] + '" \
                     data-image="' + data[0]['image'] + '" \
                     onclick="updatePokemonData(event)"/>';
@@ -134,7 +132,7 @@ function query(type) {
                     images += '<img \
                     class="sprite" \
                     src="' + data[i]['sprite'] + '" \
-                    data-name="' + data[i]['username'] + '" \
+                    data-name="' + data[i]['name'] + '" \
                     data-type="' + data[i]['type'] + '" \
                     data-image="' + data[i]['image'] + '" \
                     onclick="updatePokemonData(event)"/>';
@@ -148,8 +146,7 @@ function query(type) {
             }
 
             // If logs request, add log data to box
-            // NOTE: Should be "access_logs"
-            else if (type == "/logs") {
+            else if (type == "/access_logs") {
 
                 // Add log data to box
                 document.getElementById('box-area-logs').innerHTML = data;
@@ -174,6 +171,9 @@ function query(type) {
             // If insufficient permission, alert user
             if (error.message == 403) {
                 alert("Insufficient Permissions: You do not have permission to view this information.");
+            }
+            else {
+                console.log(error);
             }
         })
 }
@@ -224,10 +224,10 @@ function getData(type) {
         query(type);
 
     }
-    else if (type == "/access_log") {
+    else if (type == "/access_logs") {
 
-        // NOTE: Should be "access_logs"
-        query("/logs");
+        // GET log data
+        query(type);
 
     }
 
