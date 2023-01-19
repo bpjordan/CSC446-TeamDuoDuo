@@ -20,25 +20,22 @@
 <body>
     <div class="content">
         <div style="margin-bottom: -20px;">Logged into</div>
-        <h1>Bronson's PC</h1>
+        <h1 id="user-pc">Nobody's PC</h1>
         <div class="line-divider" style="margin-bottom: 10px;margin-top: -50px;"></div>
         <button class="button-large" onclick="getData('/user_pokemon')">Pokemon</button>
-        <button class="button-large" onclick="getData('/user')">User</button>
+        <button class="button-large" onclick="getData('/user')">Users</button>
         <button class="button-large" onclick="getData('/access_log')">Logs</button>
         <div class="error" id="error" style="margin-top: 10px;"></div>
         <div class="line-divider" style="margin-top: 10px;"></div>
         <div class="data-area" id="pokemon">
             <div class="data">
                 <h2>P<sub>K</sub>M<sub>N</sub> DATA</h2>
-                <div id="pokemon-data-border"
-                    style="width: 350px;height:350px;border-style:inset;border-color:#ffdd00;border-radius: 5px;border-width: 7px;">
-                    <img id="pokemon-data-image" loading="eager"
-                        style="height: 100%;width: 100%;object-fit: contain;background-color: white;"
-                        src="https://img.pokemondb.net/artwork/avif/electabuzz.avif"
-                        alt="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Forig00.deviantart.net%2F0945%2Ff%2F2011%2F237%2F0%2F8%2Fwho__s_that_pokemon__by_amitlu89-d47rmjf.png&f=1&nofb=1&ipt=2d149387fb25861c2160c4039075c064bab18fbe95ce31bd5e71647e6da51267&ipo=images" />
+                <div class="data-image-box" id="pokemon-data-border">
+                    <img class="data-image" id="pokemon-data-image" loading="eager"
+                        src="https://cdn.drawception.com/images/panels/2012/3-29/mdsLh1XtRB-2.png"/>
                 </div>
-                <p id="pokemon-data-name" style="font-size:30px;margin-top:5px;margin-bottom:-10px;">ELECTABUZZ</p>
-                <p class="type" id="pokemon-data-type">ELECTRIC</p>
+                <p id="pokemon-data-name" style="font-size:30px;margin-top:5px;margin-bottom:-10px;">NO POKEMON</p>
+                <p class="type" id="pokemon-data-type">SAD ;(</p>
             </div>
             <div class="box">
                 <h2>BOX 1</h2>
@@ -49,14 +46,12 @@
         <div class="data-area" id="users" style="display: none;">
             <div class="data">
                 <h2>U<sub>S</sub>E<sub>R</sub> DATA</h2>
-                <div id="user-data-border"
-                    style="width: 350px;height:350px;border-style:inset;border-color:#ff0000;border-radius: 5px;border-width: 7px;">
-                    <img id="user-data-image"
-                        style="height: 100%;width: 100%;object-fit: contain;background-color: white;"
-                        src="https://cdn.staticneo.com/w/pokemon/thumb/8/83/FireRed_LeafGreen_Red.png/300px-FireRed_LeafGreen_Red.png" />
+                <div class="data-image-box" id="user-data-border">
+                    <img class="data-image" id="user-data-image"
+                        src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fres.cloudinary.com%2Fteepublic%2Fimage%2Fprivate%2Fs--4Tuc7td2--%2Fc_crop%2Cx_10%2Cy_10%2Fc_fit%2Ch_1273%2Fc_crop%2Cg_north_west%2Ch_1260%2Cw_1260%2Cx_6%2Cy_6%2Fco_rgb%3Afffffe%2Ce_colorize%2Cu_Misc%3AOne%2520Pixel%2520Gray%2Fc_scale%2Cg_north_west%2Ch_1260%2Cw_1260%2Ffl_layer_apply%2Cg_north_west%2Cx_0%2Cy_0%2Fbo_0px_solid_white%2Ft_Resized%2520Artwork%2Fc_fit%2Cg_north_west%2Ch_1054%2Cw_1054%2Fco_ffffff%2Ce_outline%3A53%2Fco_ffffff%2Ce_outline%3Ainner_fill%3A53%2Fco_bbbbbb%2Ce_outline%3A3%3A1000%2Fc_mpad%2Cg_center%2Ch_1260%2Cw_1260%2Fb_rgb%3Aeeeeee%2Fc_limit%2Cf_jpg%2Ch_630%2Cq_90%2Cw_630%2Fv1574646088%2Fproduction%2Fdesigns%2F6877529_0.jpg&f=1&nofb=1&ipt=c80ec2d2e82b2725e4e1818cb68b22f9425353d901bde1de2ab9959b9712578a&ipo=images" />
                 </div>
-                <p id="user-data-name" style="font-size:30px;margin-top:5px;margin-bottom:-10px;">BRONSON</p>
-                <p class="type" id="user-data-role" style="background-color: rgb(175, 10, 10);">TRAINER</p>
+                <p id="user-data-name" style="font-size:30px;margin-top:5px;margin-bottom:-10px;">NO USER</p>
+                <p class="type" id="user-data-role">WHO EVEN ARE YOU</p>
             </div>
             <div class="box">
                 <h2>BOX 1</h2>
@@ -70,7 +65,7 @@
                 <div class="box-area-logs" id="box-area-logs"></div>
             </div>
         </div>
-        <button style="margin-top: 50px;" class="button-small" onclick="logout()">Log Out</button>
+        <button class="button-small" style="margin-top: 50px;" onclick="logout()">Log Out</button>
         <script type="text/javascript">
             // Get user data
             getData('/user');

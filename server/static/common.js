@@ -68,10 +68,10 @@ function query(type) {
                 // Create user sprite
                 var image = '<img \
                     class="sprite" \
-                    src="' + data[i]['sprite'] + '" \
-                    data-name="' + data[i]['username'] + '" \
-                    data-role="' + data[i]['role'] + '" \
-                    data-image="' + data[i]['image'] + '" \
+                    src="' + data[0]['sprite'] + '" \
+                    data-name="' + data[0]['username'] + '" \
+                    data-role="' + data[0]['role'] + '" \
+                    data-image="' + data[0]['image'] + '" \
                     onclick="updateUserData(event)"/>';
 
                 // Add user sprite to box
@@ -79,6 +79,9 @@ function query(type) {
 
                 // Click sprite to display user data
                 document.getElementById('box-area-users').firstChild.click();
+
+                // Update page to display user's name
+                document.getElementById("user-pc").innerHTML=data[0]['username'].toUpperCase() + "'s PC";
             }
 
             // If users request, add sprites to box
@@ -98,6 +101,9 @@ function query(type) {
 
                 // Add user sprites to box
                 document.getElementById('box-area-users').innerHTML = images;
+            
+                // Click sprite to display user data
+                document.getElementById('box-area-users').firstChild.click();
             }
 
             // If user pokemon request, add sprite to box
@@ -106,10 +112,10 @@ function query(type) {
                 // Create pokemon sprite
                 var image = '<img \
                     class="sprite" \
-                    src="' + data[i]['sprite'] + '" \
-                    data-name="' + data[i]['username'] + '" \
-                    data-type="' + data[i]['type'] + '" \
-                    data-image="' + data[i]['image'] + '" \
+                    src="' + data[0]['sprite'] + '" \
+                    data-name="' + data[0]['username'] + '" \
+                    data-type="' + data[0]['type'] + '" \
+                    data-image="' + data[0]['image'] + '" \
                     onclick="updatePokemonData(event)"/>';
 
                 // Add pokemon sprite to box
@@ -136,6 +142,9 @@ function query(type) {
 
                 // Add pokemon sprites to box
                 document.getElementById('box-area-pokemon').innerHTML = images;
+            
+                // Click sprite to display pokemon data
+                document.getElementById('box-area-pokemon').firstChild.click();
             }
 
             // If logs request, add log data to box
@@ -236,14 +245,17 @@ function updateUserData(e) {
     role = e.target.getAttribute('data-role');
     if (role == "Trainer") {
         document.getElementById("user-data-role").style.backgroundColor = '#ff0000';
+        document.getElementById("user-data-role").style.border = 'solid #a10000 2px';
         document.getElementById("user-data-border").style.borderColor = '#ff0000';
     }
     else if (role == "Professor") {
         document.getElementById("user-data-role").style.backgroundColor = '#D0D1CD';
+        document.getElementById("user-data-role").style.border = 'solid #818181 2px';
         document.getElementById("user-data-border").style.borderColor = '#D0D1CD';
     }
     else {
         document.getElementById("user-data-role").style.backgroundColor = '#FFDE00';
+        document.getElementById("user-data-role").style.border = 'solid #a99200 2px';
         document.getElementById("user-data-border").style.borderColor = '#FFDE00';
     }
 }
@@ -259,29 +271,32 @@ function updatePokemonData(e) {
     // Change color of type background and image border based on type
     type = e.target.getAttribute('data-type');
     if (type == "fire") {
-        document.getElementById("pokemon-data-type").style.backgroundColor = '#ff4422';
-        document.getElementById("pokemon-data-border").style.borderColor = '#ff4422';
+        backgroundColor = '#ff4422';
+        borderColor = '#a10000';
     }
     else if (type == "grass") {
-        document.getElementById("pokemon-data-type").style.backgroundColor = '#77cc55';
-        document.getElementById("pokemon-data-border").style.borderColor = '#77cc55';
+        backgroundColor = '#77cc55';
+        borderColor = '#4d8537';
     }
     else if (type == "water") {
-        document.getElementById("pokemon-data-type").style.backgroundColor = '#3399ff';
-        document.getElementById("pokemon-data-border").style.borderColor = '#3399ff';
+        backgroundColor = '#3399ff';
+        borderColor = '#246fba';
     }
     else if (type == "electric") {
-        document.getElementById("pokemon-data-type").style.backgroundColor = '#ffcc33';
-        document.getElementById("pokemon-data-border").style.borderColor = '#ffcc33';
+        backgroundColor = '#ffcc33';
+        borderColor = '#c59d24';
     }
     else if (type == "rock") {
-        document.getElementById("pokemon-data-type").style.backgroundColor = '#bbaa66';
-        document.getElementById("pokemon-data-border").style.borderColor = '#bbaa66';
+        backgroundColor = '#bbaa66';
+        borderColor = '#938651';
     }
     else {
-        document.getElementById("pokemon-data-type").style.backgroundColor = '#aaaa99';
-        document.getElementById("pokemon-data-border").style.borderColor = '#aaaa99';
+        backgroundColor = '#aaaa99'
+        borderColor = '#77776a'
     }
+    document.getElementById("pokemon-data-type").style.backgroundColor = backgroundColor;
+    document.getElementById("pokemon-data-type").style.border = 'solid ' + borderColor + ' 2px';
+    document.getElementById("pokemon-data-border").style.borderColor = backgroundColor;
 }
 
 // Function that logs the user out
