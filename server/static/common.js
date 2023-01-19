@@ -63,12 +63,28 @@ function query(type) {
         .then((data) => {
 
             // If user request, add sprite to box
-            if(type == "/user"){
-                // Not yet implemented
+            if (type == "/user") {
+                
+                // Create user sprite
+                var image = '<img \
+                    class="sprite" \
+                    src="' + data[i]['sprite'] + '" \
+                    data-name="' + data[i]['username'] + '" \
+                    data-role="' + data[i]['role'] + '" \
+                    data-image="' + data[i]['image'] + '" \
+                    onclick="updateUserData(event)"/>';
+
+                // Add user sprite to box
+                document.getElementById('box-area-users').innerHTML = image;
+
+                // Click sprite to display user data
+                document.getElementById('box-area-users').firstChild.click();
             }
 
             // If users request, add sprites to box
             else if (type == "/users") {
+
+                // Create user sprites
                 var images = '';
                 for (var i = 0; i < data.length; i++) {
                     images += '<img \
@@ -79,16 +95,34 @@ function query(type) {
                     data-image="' + data[i]['image'] + '" \
                     onclick="updateUserData(event)"/>';
                 }
+
+                // Add user sprites to box
                 document.getElementById('box-area-users').innerHTML = images;
             }
 
             // If user pokemon request, add sprite to box
-            else if (type == "/user_pokemon"){
-                // Not yet implemented
+            else if (type == "/user_pokemon") {
+                
+                // Create pokemon sprite
+                var image = '<img \
+                    class="sprite" \
+                    src="' + data[i]['sprite'] + '" \
+                    data-name="' + data[i]['username'] + '" \
+                    data-type="' + data[i]['type'] + '" \
+                    data-image="' + data[i]['image'] + '" \
+                    onclick="updatePokemonData(event)"/>';
+
+                // Add pokemon sprite to box
+                document.getElementById('box-area-pokemon').innerHTML = image;
+            
+                // Click sprite to display pokemon data
+                document.getElementById('box-area-pokemon').firstChild.click();
             }
 
             // If pokemon request, add sprites to box
             else if (type == "/pokemon") {
+
+                // Create pokemon sprites
                 var images = '';
                 for (var i = 0; i < data.length; i++) {
                     images += '<img \
@@ -99,6 +133,8 @@ function query(type) {
                     data-image="' + data[i]['image'] + '" \
                     onclick="updatePokemonData(event)"/>';
                 }
+
+                // Add pokemon sprites to box
                 document.getElementById('box-area-pokemon').innerHTML = images;
             }
 
