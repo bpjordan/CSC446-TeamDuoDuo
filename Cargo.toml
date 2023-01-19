@@ -1,0 +1,10 @@
+
+[workspace]
+
+members = [
+    "server",
+    "authgen",
+    "mfalib"
+]
+
+default-members = ["server"]

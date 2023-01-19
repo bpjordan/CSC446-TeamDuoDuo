@@ -13,7 +13,7 @@ services:
       timeout: 5s
       retries: 55
   server:
-    build: ./server
+    build: .
     restart: always
     environment:
       - HOST=0.0.0.0

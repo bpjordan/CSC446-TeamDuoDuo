@@ -21,9 +21,11 @@ COPY --from=prepare /builder/recipe.json recipe.json
 #Build dependencies separately from main since dependencies take ages
 RUN cargo chef cook --release --recipe-path recipe.json
 
-COPY src src
+COPY mfalib/src mfalib/src
 
-RUN touch src/main.rs
+COPY server/src server/src
+
+RUN touch server/src/main.rs mfalib/src/lib.rs
 
 RUN cargo build --release
 
@@ -37,6 +39,6 @@ WORKDIR /app
 COPY --from=build /builder/target/release/server .
 
 #Rocket needs Rocket.toml config file in its runtime environment
-COPY Rocket.toml .
+COPY server/Rocket.toml .
 
 ENTRYPOINT [ "/app/server" ]
