@@ -1,6 +1,7 @@
 
 use std::fmt::Debug;
 
+use rocket::futures::TryFutureExt;
 use rocket::http::Status;
 use rocket::serde::{Serialize, Deserialize, json::Json};
 use rocket_db_pools::Connection;
@@ -41,7 +42,19 @@ pub async fn query_users(_s: auth::GymLeaderSession ,mut db: Connection<db::User
 
 
 #[get("/user")]
-pub async fn query_current_user(_user_session: auth::UserSession, _db: Connection<db::Users>) -> Result<Json<User>, Status> {
+pub async fn query_current_user(user_session: auth::TrainerSession, mut db: Connection<db::Users>) -> Result<Json<User>, Status> {
 
-    Err(Status::NotImplemented)
+
+    let user = sqlx::query_as(" SELECT users.*, CAST(role AS UNSIGNED)-1 AS role FROM users WHERE username = ?")
+    .bind(&user_session.user)
+    .fetch_optional(&mut *db)
+    .or_else(|e| async move {
+        println!("   !! Got error {e}");
+        Err(Status::InternalServerError)
+    })
+    .and_then(|u| async {
+        Ok(u.ok_or(Status::NotFound)?)
+    }).await?;
+
+    Ok(Json(user))
 }

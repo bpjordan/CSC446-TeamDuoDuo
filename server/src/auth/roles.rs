@@ -1,4 +1,5 @@
 
+use std::ops::Deref;
 use std::str::FromStr;
 
 use rocket::http::Status;
@@ -122,4 +123,23 @@ impl<'r> FromRequest<'r> for GymLeaderSession {
             Outcome::Failure(e) => Outcome::Failure(e),
         }
     }
+}
+
+// Make the various session types transparent wrappers around their associated UserSession
+impl Deref for TrainerSession {
+    type Target = UserSession;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
+
+impl Deref for ProfessorSession {
+    type Target = UserSession;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+impl Deref for GymLeaderSession {
+    type Target = UserSession;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
 }
