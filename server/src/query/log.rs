@@ -38,7 +38,9 @@ pub async fn query_logs (last: Option<u64>, _s: auth::GymLeaderSession, mut db: 
 -> Result<Json<Vec<LogEntry>>, Status> {
 
 
-    let logs = sqlx::query_as("SELECT * FROM access_log ORDER BY timestamp LIMIT ?")
+    let logs = sqlx::query_as(
+        "SELECT * FROM access_log ORDER BY timestamp DESC LIMIT ?"
+    )
     .bind(last.unwrap_or(std::u64::MAX))
     .fetch(&mut *db)
     .try_collect::<Vec<_>>()
