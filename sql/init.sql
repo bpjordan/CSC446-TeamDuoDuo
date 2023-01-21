@@ -32,6 +32,7 @@ CREATE TABLE access_log (
     username_provided   VARCHAR(255) NOT NULL,
     password_provided   CHAR(96) NOT NULL,
     success             BOOLEAN NOT NULL,
+    mfa_success         BOOLEAN,
     user_found          VARCHAR(255),
     session_len         INT UNSIGNED,
     error               VARCHAR(255),

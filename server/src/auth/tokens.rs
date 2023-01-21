@@ -1,6 +1,7 @@
 
 use rand::RngCore;
 use jsonwebtoken::{TokenData, Header, Validation, EncodingKey, DecodingKey};
+use rocket::serde::DeserializeOwned;
 use rocket_db_pools::{Connection, sqlx};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -23,7 +24,7 @@ pub fn get_jwt_secret() -> String {
 }
 
 
-pub fn parse_jwt<'a> (token: &'a str) -> Option<TokenData<UserSession>> {
+pub fn parse_jwt<'a, T: DeserializeOwned> (token: &'a str) -> Option<TokenData<T>> {
     jsonwebtoken::decode(
         &token,
         &DecodingKey::from_secret(get_jwt_secret().as_bytes()),

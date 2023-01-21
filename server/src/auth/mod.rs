@@ -11,6 +11,7 @@ use rocket_db_pools::sqlx;
 
 mod tokens;
 mod roles;
+mod mfa;
 use crate::db;
 
 pub use roles::{UserSession, UserRole, TrainerSession, ProfessorSession, GymLeaderSession};
@@ -110,6 +111,6 @@ async fn login_handler(req_creds: Form<UserCredentials>, cookies: &CookieJar<'_>
 // Function called by main to add module to the api
 pub fn stage() -> AdHoc {
     AdHoc::on_ignite("Auth endpoints", |rocket| async {
-        rocket.mount("/api", routes![login_handler])
+        rocket.mount("/api", routes![login_handler, mfa::mfa_auth])
     })
 }
