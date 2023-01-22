@@ -14,17 +14,19 @@ pub fn gen_mfa(_user_secret: &[u8; 32]) -> String {
     // current UTC time
     // we simply don't put the seconds in the string
     let time_in_england = chrono::offset::Utc::now();
-    let mut formatted_bad_teeth_time = time_in_england
+    let formatted_bad_teeth_time = time_in_england
         .format("%Y%m%d%H%M")
         .to_string();
 
-    // Add user secret to UTC time string
-    formatted_bad_teeth_time.push_str(
-        &String::from_utf8(_user_secret.iter().cloned().collect())
-        .unwrap());
+    // create new vector which we will eventually feed to the md5 hasher
+    let mut md5_input: Vec<u8> = Vec::new();
+    // add the user secret to the vector
+    md5_input.extend(_user_secret.iter().copied());
+    // add the current time to the vector
+    md5_input.extend(formatted_bad_teeth_time.as_bytes());
 
     // hash string
-    super_secure_md5.input(formatted_bad_teeth_time.as_bytes());
+    super_secure_md5.input(&md5_input);
 
     // collect the digits from the hash
     let mut hash_only_numbers = String::new();
