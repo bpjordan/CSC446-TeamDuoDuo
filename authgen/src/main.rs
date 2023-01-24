@@ -4,8 +4,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 static _SAMPLE_BASE64_USER_SECRET: &str = "gzBsRiEnc3Kwc/26S3gklyz5M4UUOztqbO4pbhtgDi4=";
 
-const CODE_TIME: u64 = 30; // seconds
-
 fn main() {
     let user_secret = &general_purpose::STANDARD
     .decode(_SAMPLE_BASE64_USER_SECRET)
@@ -28,7 +26,7 @@ fn main() {
     .expect("Failed to get current time. Is your system time set to before 1/1/1970?")
     .as_secs();
 
-    let time_left = 30 - (current_unix_time % CODE_TIME);
+    let time_left = 30 - (current_unix_time % mfalib::CODE_TIME);
 
     println!("Code: {}", mfa_code);
     println!("This code will last for the next {} seconds.", time_left);

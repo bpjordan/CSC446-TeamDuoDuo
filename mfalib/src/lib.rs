@@ -4,7 +4,7 @@ use crypto::{md5::Md5, digest::Digest};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const MFA_CODE_LENGTH: usize = 6;
-const CODE_TIME: u64 = 30; // seconds
+pub const CODE_TIME: u64 = 30; // seconds
 
 pub fn gen_mfa(_user_secret: &[u8; 32]) -> String {
     // MD5 can be apparently cracked by a cell phone in 30s
