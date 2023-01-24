@@ -35,7 +35,7 @@ Responds with `200 OK` and a JSON string
 ### /api/login (POST)
 
 Checks if a user exists in the database with the correct username & password.
-If login is correct, returns `200 OK` status code and redirects user to the MFA page.
+If login is correct, returns `200 OK` status code with an included stage-1 token (which only has a username and a signature). The user is then redirected to the MFA page.
 If login is incorrect, returns `401 Unauthorized` status code.
 
 ### /api/mfa (POST)
