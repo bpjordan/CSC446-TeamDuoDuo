@@ -1,4 +1,5 @@
 use mfalib;
+use std::env;
 use base64::{Engine as _, engine::general_purpose};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -19,6 +20,13 @@ fn main() {
         // I promise this won't fail
         .unwrap()
     );
+
+    // Read command-line arguments
+    let args: Vec<_> = env::args().collect();
+    if args.len() > 1 && (args[1] == "-q" || args[1] == "--quiet") {
+        println!("{}",mfa_code);
+        return;
+    }
 
     // number of seconds since January 1, 1970
     let current_unix_time = SystemTime::now()
