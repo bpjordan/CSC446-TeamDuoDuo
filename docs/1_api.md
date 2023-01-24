@@ -42,7 +42,7 @@ If login is incorrect, returns `401 Unauthorized` status code.
 
 Checks if a user's MFA code is valid.
 If MFA code is valid, returns `200 OK` status code and includes an authentication token as a cookie.
-If MFA code is invalid, returns `400 Bad Request`.
+If MFA code is invalid, returns `401 Unauthorized`.
 
 Request body should include HTTP form with parameters:
 
