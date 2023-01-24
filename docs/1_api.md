@@ -35,8 +35,14 @@ Responds with `200 OK` and a JSON string
 ### /api/login (POST)
 
 Checks if a user exists in the database with the correct username & password.
-If login is correct, returns `200 OK` status code and an authorization cookie is added.
+If login is correct, returns `200 OK` status code with an included stage-1 token (which only has a username and a signature).
 If login is incorrect, returns `401 Unauthorized` status code.
+
+### /api/mfa (POST)
+
+Checks if a user's MFA code is valid.
+If MFA code is valid, returns `200 OK` status code and includes an authentication token as a cookie.
+If MFA code is invalid, returns `401 Unauthorized`.
 
 Request body should include HTTP form with parameters:
 
