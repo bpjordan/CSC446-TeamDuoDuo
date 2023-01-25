@@ -17,6 +17,49 @@ function login(e) {
     })
 
         // Check for errors in request
+        // If no errors, convert response into json
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+
+            }
+            else { throw Error(res.status) }
+        })
+
+        // Display MFA modal to user
+        // Also save MFA token from response in modal form
+        .then((data) => {
+            document.getElementById("mfa-modal").style.display = "block";
+            document.getElementById("auth_token").value = data.mfa_token;
+        })
+
+        // Display errors to user
+        .catch((error) => {
+            if (error.message == 401) {
+                document.getElementById("error").textContent = "Incorrect username or password, please try again.";
+            }
+            else {
+                console.log(error);
+            }
+        });
+};
+
+// Function that checks user's mfa code
+function mfa(e) {
+    // Stop form submission
+    e.preventDefault();
+
+    // Get form using id
+    var form = document.getElementById("mfa-form");
+
+    // Authenticate user using form data
+    fetch("http://" + parsedUrl.host + "/api/mfa", {
+        method: "POST",
+        body: new URLSearchParams(new FormData(form)),
+        mode: "no-cors"
+    })
+
+        // Check for errors in request
         // If no errors, navigate to main page
         .then(res => {
             if (res.ok) {
@@ -28,10 +71,19 @@ function login(e) {
         // Display errors to user
         .catch((error) => {
             if (error.message == 401) {
-                document.getElementById("error").textContent = "Incorrect username or password, please try again.";
+                document.getElementById("mfa-error").textContent = "Incorrect code, please try again.";
+            }
+            else if (error.message == 400) {
+                document.getElementById("mfa-error").textContent = "Token has expired, please try logging in again.";
+            }
+            else if (error.message == 422) {
+                document.getElementById("mfa-error").textContent = "Incorrect code length, please try again.";
+            }
+            else {
+                document.getElementById("mfa-error").textContent = error.message + " Error";
             }
         });
-};
+}
 
 // Function that queries the database
 function query(type) {
@@ -79,7 +131,7 @@ function query(type) {
                 document.getElementById('box-area-users').firstChild.click();
 
                 // Update page to display user's name
-                document.getElementById("user-pc").innerHTML=data['username'].toUpperCase() + "'s PC";
+                document.getElementById("user-pc").innerHTML = data['username'].toUpperCase() + "'s PC";
             }
 
             // If users request, add sprites to box
@@ -99,14 +151,14 @@ function query(type) {
 
                 // Add user sprites to box
                 document.getElementById('box-area-users').innerHTML = images;
-            
+
                 // Click sprite to display user data
                 document.getElementById('box-area-users').firstChild.click();
             }
 
             // If user pokemon request, add sprite to box
             else if (type == "/user_pokemon") {
-                
+
                 // Create pokemon sprite
                 var image = '<img \
                     class="sprite" \
@@ -118,7 +170,7 @@ function query(type) {
 
                 // Add pokemon sprite to box
                 document.getElementById('box-area-pokemon').innerHTML = image;
-            
+
                 // Click sprite to display pokemon data
                 document.getElementById('box-area-pokemon').firstChild.click();
             }
@@ -140,7 +192,7 @@ function query(type) {
 
                 // Add pokemon sprites to box
                 document.getElementById('box-area-pokemon').innerHTML = images;
-            
+
                 // Click sprite to display pokemon data
                 document.getElementById('box-area-pokemon').firstChild.click();
             }

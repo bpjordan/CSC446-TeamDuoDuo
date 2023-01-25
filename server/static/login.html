@@ -26,6 +26,19 @@
         <button class="button-small" onclick="login(event)">Login</button>
         <p class="error" id="error"></p>
     </form>
+    <div class="mfa-modal" id="mfa-modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('mfa-modal').style.display='none'">&times;</span>
+            <h2>Enter your MFA code:</h2>
+            <form id="mfa-form">
+                <input name="code" style="font-size: larger; text-align: center; width: 150px;"/>
+                <p></p>
+                <input name="auth_token" id="auth_token" style="display: none;"/>
+                <button class="button-small" onclick="mfa(event)">Verify</button>
+                <p class="error" id="mfa-error"></p>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>
