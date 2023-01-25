@@ -1,9 +1,11 @@
 
 use std::ops::Deref;
 use std::str::FromStr;
+use std::time::{SystemTime, UNIX_EPOCH};
 
+use rand::RngCore;
 use rocket::http::Status;
-use rocket::outcome::{IntoOutcome};
+use rocket::outcome::IntoOutcome;
 use rocket::request::Outcome;
 use rocket::{request::FromRequest, Request};
 use rocket::serde::{Serialize, Deserialize};
@@ -12,7 +14,7 @@ use sqlx::Type;
 
 use crate::db;
 
-use super::tokens;
+use super::tokens::{self, ToJWT};
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, Type, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(crate = "rocket::serde")]
@@ -46,6 +48,29 @@ pub struct UserSession {
     pub role: UserRole,
 }
 
+impl UserSession {
+    pub fn new(user: String, role: UserRole) -> Self {
+
+        let iat = SystemTime::now()
+        .duration_since(UNIX_EPOCH).unwrap().as_secs();
+        let exp = iat + 3600;
+
+        let mut session = [0u8; 16];
+        rand::thread_rng().fill_bytes(&mut session);
+        let session = hex::encode_upper(session);
+
+        Self {
+            iat,
+            exp,
+            user,
+            session,
+            role,
+        }
+    }
+}
+
+impl ToJWT for UserSession {}
+
 // Instructions for how to get the user's session data from a request
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for UserSession {
@@ -62,9 +87,8 @@ impl<'r> FromRequest<'r> for UserSession {
 
         let claims = req.cookies()
             .get("session_token")
-            .and_then(|c| tokens::parse_jwt(c.value()))
+            .and_then(|c| UserSession::from_jwt(c.value().to_string()))
             .and_then(|t| Some(t.claims));
-
 
         let valid = match &claims {
             Some(c) => tokens::is_valid(c, conn).await,
@@ -132,12 +156,12 @@ impl Deref for TrainerSession {
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 
-
 impl Deref for ProfessorSession {
     type Target = UserSession;
 
     fn deref(&self) -> &Self::Target { &self.0 }
 }
+
 impl Deref for GymLeaderSession {
     type Target = UserSession;
 

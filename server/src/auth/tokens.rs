@@ -1,12 +1,11 @@
 
 use rand::RngCore;
 use jsonwebtoken::{TokenData, Header, Validation, EncodingKey, DecodingKey};
-use rocket::serde::DeserializeOwned;
+use rocket::serde::{DeserializeOwned, Serialize};
 use rocket_db_pools::{Connection, sqlx};
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::db;
-use super::roles::{UserSession, UserRole};
+use super::roles::UserSession;
 
 const SECRET_ENV_VAR: &'static str = "SERVER_JWT_SECRET";
 
@@ -23,15 +22,6 @@ pub fn get_jwt_secret() -> String {
     }
 }
 
-
-pub fn parse_jwt<'a, T: DeserializeOwned> (token: &'a str) -> Option<TokenData<T>> {
-    jsonwebtoken::decode(
-        &token,
-        &DecodingKey::from_secret(get_jwt_secret().as_bytes()),
-        &Validation::default()
-    ).ok()
-}
-
 pub(crate) async fn is_valid(claim: &UserSession ,mut conn: Connection<db::Users>) -> bool {
 
     sqlx::query(
@@ -42,22 +32,23 @@ pub(crate) async fn is_valid(claim: &UserSession ,mut conn: Connection<db::Users
 
 }
 
-pub fn generate_jwt(user: String, role: UserRole, session: String) -> String {
-    let now = SystemTime::now()
-    .duration_since(UNIX_EPOCH).unwrap().as_secs();
-    let expires = now + 3600;   //Sessions expire after 1 hour
+pub trait ToJWT 
+    where Self: Serialize + DeserializeOwned
+    {
+    fn to_jwt(&self) -> Result<String, &'static str> {
+        jsonwebtoken::encode(
+            &Header::default(),
+            self,
+            &EncodingKey::from_secret(get_jwt_secret().as_bytes())
+        )
+        .or(Err("Couldn't generate JWT"))
+    }
 
-    let session_token = UserSession {
-        iat: now,
-        exp: expires,
-        user,
-        session,
-        role,
-    };
-
-    jsonwebtoken::encode(
-        &Header::default(),
-        &session_token,
-        &EncodingKey::from_secret(get_jwt_secret().as_bytes())
-    ).unwrap()
+    fn from_jwt(token: String) -> Option<TokenData<Self>> {
+        jsonwebtoken::decode(
+            &token,
+            &DecodingKey::from_secret(get_jwt_secret().as_bytes()),
+            &Validation::default()
+        ).ok()
+    }
 }
