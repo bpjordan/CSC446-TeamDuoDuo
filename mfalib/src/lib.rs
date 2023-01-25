@@ -1,29 +1,31 @@
 extern crate crypto;
 
-use chrono;
-use crypto::md5::Md5;
-use crypto::digest::Digest;
+use crypto::{md5::Md5, digest::Digest};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 const MFA_CODE_LENGTH: usize = 6;
+pub const CODE_TIME: u64 = 30; // seconds
 
 pub fn gen_mfa(_user_secret: &[u8; 32]) -> String {
     // MD5 can be apparently cracked by a cell phone in 30s
     // Hopefully we generate our code after 30s!
     let mut super_secure_md5 = Md5::new();
 
-    // current UTC time
-    // we simply don't put the seconds in the string
-    let time_in_england = chrono::offset::Utc::now();
-    let formatted_bad_teeth_time = time_in_england
-        .format("%Y%m%d%H%M")
-        .to_string();
+    // number of seconds since January 1, 1970: u64
+    let mut current_unix_time = SystemTime::now()
+    .duration_since(UNIX_EPOCH)
+    .expect("Failed to get current time. Is your system time set to before 1/1/1970?")
+    .as_secs();
+
+    // round to nearest CODE_TIME seconds
+    current_unix_time -= current_unix_time % CODE_TIME;
 
     // create new vector which we will eventually feed to the md5 hasher
     let mut md5_input: Vec<u8> = Vec::new();
     // add the user secret to the vector
     md5_input.extend(_user_secret.iter().copied());
     // add the current time to the vector
-    md5_input.extend(formatted_bad_teeth_time.as_bytes());
+    md5_input.extend(current_unix_time.to_string().as_bytes());
 
     // hash string
     super_secure_md5.input(&md5_input);
