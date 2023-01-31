@@ -7,7 +7,6 @@ use rocket::http::Status;
 use rocket::form::Form;
 use rocket::serde::json::Value;
 use rocket::serde::json::serde_json::json;
-use rocket_db_pools::sqlx::Row;
 use rocket_db_pools::sqlx;
 
 mod tokens;
@@ -36,7 +35,7 @@ async fn login_handler(req_creds: Form<UserCredentials>, db_pool: &db::Users) ->
 
     async {
         let query_connection = &mut db_pool.acquire().await?;
-        sqlx::query("SELECT username, password, role FROM users WHERE username = ?")
+        sqlx::query_as::<_, (String, String, UserRole)>("SELECT username, password, CAST(role AS UNSIGNED)-1 FROM users WHERE username = ?")
         .bind(query_username)
         .fetch_optional(query_connection).await
     }
@@ -46,11 +45,7 @@ async fn login_handler(req_creds: Form<UserCredentials>, db_pool: &db::Users) ->
     .and_then(|res| async {
 
         // Returns Some only if username exists and passwords match
-        Ok(res.and_then(|row| {
-            let username = row.try_get::<String, _>(0).ok()?;
-            let password = row.try_get::<String, _>(1).ok()?;
-            let role = row.try_get::<String, _>(2).ok()?.parse::<UserRole>().ok()?;
-
+        Ok(res.and_then(|(username, password, role)| {
             Argon2::default().verify_password(
                 check_password.as_bytes(),
                 &PasswordHash::new(&password).ok()?

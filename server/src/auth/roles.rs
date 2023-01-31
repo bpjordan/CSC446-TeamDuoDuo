@@ -1,6 +1,5 @@
 
 use std::ops::Deref;
-use std::str::FromStr;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use rand::RngCore;
@@ -23,19 +22,6 @@ pub enum UserRole {
     Trainer,
     Professor,
     GymLeader,
-}
-
-impl FromStr for UserRole {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "trainer" => Ok(Self::Trainer),
-            "professor" => Ok(Self::Professor),
-            "leader" | "gymleader" | "gym_leader" => Ok(Self::GymLeader),
-            _ => Err(())
-        }
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -102,7 +88,7 @@ impl<'r> FromRequest<'r> for UserSession {
     }
 }
 
-// Simple wrapper structs on a user session that first checks if the user has the appropriate permissions
+// Simple wrapper structs that check if a UserSession has the appropriate permission before forwarding
 pub struct TrainerSession(UserSession);
 pub struct ProfessorSession(UserSession);
 pub struct GymLeaderSession(UserSession);
