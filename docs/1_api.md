@@ -48,3 +48,17 @@ Request body should include HTTP form with parameters:
 
 - `username`: username to check
 - `password`: password to check, as plaintext
+
+### /api/blog/query (GET)
+
+Requests the posts and comments for the blog page.
+Returns a list of posts and a list of comments.
+
+### /api/blog/add_comment (POST) 
+
+Adds a new blog comment to the MySQL database. Returns `200 OK` and a new list of comments to display.
+
+Request body should include HTTP form with parameters:
+
+- `username`: username to post the comment as (not matched with users in the database).
+- `comment`: comment to post, as plaintext
