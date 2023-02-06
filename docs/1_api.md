@@ -51,14 +51,12 @@ Request body should include HTTP form with parameters:
 
 ### /api/blog/query (GET)
 
-Requests the posts and comments for the blog page.
-Returns a list of posts and a list of comments.
+Requests the comments for the blog page.
+Returns a list of comments.
 
-### /api/blog/add_comment (POST) 
+### /api/blog/add_comment (PUT) 
 
-Adds a new blog comment to the MySQL database. Returns `200 OK` and a new list of comments to display.
+Adds a new blog comment to the MySQL database.
 
-Request body should include HTTP form with parameters:
-
-- `username`: username to post the comment as (not matched with users in the database).
+Request body should include HTTP form with parameter:
 - `comment`: comment to post, as plaintext
