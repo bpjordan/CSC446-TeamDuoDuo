@@ -5,6 +5,7 @@ use rocket::{Rocket, Build};
 mod auth;
 mod query;
 mod db;
+mod comment;
 
 mod frontend {
     use rocket::response::Redirect;
@@ -35,5 +36,6 @@ fn rocket() -> Rocket<Build> {
     .attach(auth::stage())
     .attach(query::stage())
     .attach(frontend::stage())
+    .attach(comment::stage())
 
 }

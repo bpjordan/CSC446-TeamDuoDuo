@@ -59,4 +59,4 @@ Returns a list of comments.
 Adds a new blog comment to the MySQL database.
 
 Request body should include HTTP form with parameter:
-- `comment`: comment to post, as plaintext
+- `content`: comment to post, as plaintext

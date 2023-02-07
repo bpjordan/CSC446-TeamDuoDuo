@@ -6,7 +6,7 @@ use rocket::serde::json::Json;
 use crate::auth;
 
 mod users;
-mod log;
+pub(crate) mod log;
 mod pokemon;
 
 // Endpoint that lists allowed queries for a user

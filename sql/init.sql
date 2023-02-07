@@ -40,6 +40,13 @@ CREATE TABLE access_log (
     FOREIGN KEY (user_found) REFERENCES users(username)
 );
 
+CREATE TABLE comment (
+    id                  BIGINT NOT NULL AUTO_INCREMENT,
+    timestamp           DATETIME DEFAULT CURRENT_TIMESTAMP,
+    content             TEXT,
+    PRIMARY KEY (id)
+);
+
 INSERT INTO users(username, password, email, role, mfa_secret, sprite, image)
 VALUES(
     "brendan",
