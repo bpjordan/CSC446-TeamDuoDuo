@@ -3,6 +3,7 @@
 input-files:
 - 1_api.md
 - 2_building.md
+- 3_covert.md
 
 output-file: docs.pdf
 standalone: true
