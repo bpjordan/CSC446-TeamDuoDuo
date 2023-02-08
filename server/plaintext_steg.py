@@ -97,6 +97,7 @@ def print_help():
     print("Optional parameters:")
     print("\t-h : print this help message")
     print("\t-i <file> : specify a plaintext input file to encode")
+    print("\t-p : include HTML <p> tags. Useful for pasting to our website.")
 
 input_str = ""
 replace_p = False
