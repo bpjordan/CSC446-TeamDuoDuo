@@ -186,6 +186,16 @@ label {
     text-shadow: 0 0 2px #000000;
 }
 
-.color-tester {
-    background-color: #938651;
+.blog-post {
+    padding-left: 100px;
+    padding-right: 100px;
+    text-align: left;
+}
+
+.blog-comment {
+    padding: 5px 5px 5px 5px;
+    display: flex;
+    gap: 10px;
+    padding-bottom: 10px;
+    padding-top: 10px;
 }

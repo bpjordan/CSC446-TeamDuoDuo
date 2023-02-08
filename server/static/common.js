@@ -85,6 +85,88 @@ function mfa(e) {
         });
 }
 
+// Function that checks user's mfa code
+function getComments() {
+
+    // Get comments
+    fetch("http://" + parsedUrl.host + "/api/blog/query", {
+        method: "GET",
+        mode: "no-cors"
+    })
+
+        // Check for errors in request
+        // If no errors, convert response to json
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+            }
+            else { throw Error(res.status) }
+        })
+
+        // Add comments to page
+        .then((data) => {
+            var existingComments = document.getElementById("blog-comments").children;
+
+            // Update comments only if there is a new comment or no comments
+            if (existingComments.length < data.length) {
+
+                // Add each comment to page
+                var comments = ""
+                for (let index = 0; index < data.length; index++) {
+                    const content = data[index]['content'];
+                    comments += "<div class='blog-comment'><img src='https://cdn-icons-png.flaticon.com/512/287/287226.png' style='width: 50px; height: 50px;' /><div><div style='font-weight: bold; margin-bottom: 10px;'>Anonymous</div><div>" + content + "</div></div></div>"
+                }
+                document.getElementById("blog-comments").innerHTML = comments
+            }
+        })
+
+        // Display errors to user
+        .catch((error) => {
+            console.log(error);
+        });
+}
+
+// Function that checks user's mfa code
+function postComment(e) {
+    // Stop form submission
+    e.preventDefault();
+
+    // Get form using id
+    var form = document.getElementById("comment-form");
+    var comment = document.getElementById("comment-form").children[0].value;
+
+    // If the user did not type anything, display error
+    if (comment.length == 0) {
+        document.getElementById("comment-error").innerHTML = "Your comment cannot be empty."
+        return;
+    }
+
+    // Send form data
+    fetch("http://" + parsedUrl.host + "/api/blog/add_comment", {
+        method: "PUT",
+        body: new URLSearchParams(new FormData(form))
+    })
+
+        // Check for errors in request
+        // If no errors, update comments
+        .then(res => {
+            if (res.ok) {
+                // Update list of comments
+                getComments()
+
+                // Clear comment box and any error messages
+                document.getElementById("comment-content").value = ""
+                document.getElementById("comment-error").innerHTML = ""
+            }
+            else { throw Error(res.status) }
+        })
+
+        // Display errors to user
+        .catch((error) => {
+            console.log(error);
+        });
+}
+
 // Function that queries the database
 function query(type) {
 

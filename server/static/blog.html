@@ -1,0 +1,44 @@
+<html>
+<link rel="shortcut icon" type="image/x-icon" href="favicon.png">
+<link type="text/css" rel="stylesheet" href="common.css">
+<script type="text/javascript" src="common.js"></script>
+
+<head>
+    <script type="text/javascript">
+        getComments()
+        setInterval(getComments, 5000);
+    </script>
+    <title>
+        DuoDuo
+    </title>
+</head>
+
+<body>
+    <div class="content">
+        <h1>THE P<sub>K</sub>M<sub>N</sub> BLOG</h1>
+        <div class="blog-post">
+            <h3 style="margin-bottom: -10px;">Post Title</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                incididunt ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+                ex ea commodo consequat.</p>
+            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+                fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
+                deserunt mollit anim id est laborum.</p>
+            <h3>COMMENTS</h3>
+            <div class="line-divider" style="margin-top: -20px;"></div>
+            <div class="blog-comments" id="blog-comments">
+            </div>
+            <h3 style="margin-bottom: -10px;">ADD COMMENT</h3>
+            <div class="blog-comment">
+                <img src="https://cdn-icons-png.flaticon.com/512/287/287226.png" style="width: 50px; height: 50px;" />
+                <form style="width: 100%;" id="comment-form">
+                    <textarea name="content" id="comment-content" style="width:100%; height: 50px;"></textarea>
+                    <button class="button-small" style="margin-top: 5px;" onclick="postComment(event)">Post Comment</button>
+                    <p class="error" id="comment-error" style="margin-top: 5px;"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <button class="button-small" onclick="{location.href='/'}">Back to Login</button>
+</body>
