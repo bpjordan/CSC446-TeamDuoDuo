@@ -68,7 +68,7 @@ VALUES(
 ),
 (
     "sydney",
-    "$argon2id$v=19$m=4096,t=3,p=1$UmRxb2ZHQmV2cDBQUG1odw$puIZlAash2vZjfDOXuVfFA",
+    "$argon2i$v=19$m=4096,t=3,p=1$MFhBejk5ODBSOUVZWTFlWg$/zMh5Pqht+XI4lNbhydSzQ",
     "sydney@example.com",
     'trainer',
     @example_mfa_secret,
