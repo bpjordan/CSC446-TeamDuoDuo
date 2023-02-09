@@ -1,6 +1,10 @@
+import codecs
 import numpy
 import pyperclip
 import sys
+
+ENCODING = "utf8"
+SECRET_ENCODING = "rot13"
 
 mongolian_vowel_separator = "\u180e"
 zero_width_space = "\u200b"
@@ -11,9 +15,9 @@ zero_width_no_break = "\ufeff"
 
 hidden_chars = [
         mongolian_vowel_separator,
-        zero_width_space,
         left_to_right_mark,
         zero_width_no_break,
+        zero_width_space,
         ]
 
 def encode(input_str):
@@ -30,7 +34,12 @@ def encode(input_str):
         exit(0)
 
     hidden_text = input("Please enter your hidden message: ")
-    hidden_text_bin = ''.join(format(ord(x), 'b').zfill(8) for x in hidden_text)
+    # hidden_text_bin = ''.join(format(ord(x), 'b').zfill(8) for x in hidden_text)
+
+    hidden_text_bin = ""
+    for my_byte in codecs.encode(hidden_text, SECRET_ENCODING).encode(ENCODING):
+        hidden_text_bin += f"{my_byte:0>8b}"
+
     group_size = 2
     grouped = [hidden_text_bin[i:i+group_size] for i in range(0, len(hidden_text_bin), group_size)]
 
@@ -83,11 +92,10 @@ def decode():
         next_addition = format(index, 'b').zfill(2)
         bin_text += next_addition
 
-    plaintext = ""
-    for i in range(0, len(bin_text), 8):
-        plaintext += chr(int(bin_text[i:i+8], 2))
+    stegged_text = bytes([int(bin_text[i:i+8], 2) for i in range(0, len(bin_text), 8)]).decode(ENCODING)
+    stegged_text = codecs.decode(stegged_text, SECRET_ENCODING)
 
-    print(f"Stegged text: '{plaintext}'")
+    print(f"Stegged text: '{stegged_text}'")
 
 def print_help():
     print("Help menu:")

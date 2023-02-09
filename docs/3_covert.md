@@ -18,8 +18,7 @@ These characters are interchangable with binary using the following scheme:
 
 ## Encoding
 
-Plaintext is converted character-by-character into an ASCII-encoded binary string.
-Binary characters are then replaced with zero-width characters as shown above.
+Plaintext is encoded with rot13 and then encoded with UTF-8. Binary characters are then replaced with zero-width characters as shown above.
 
 The list of zero-width characters is then mixed into the containing text (blog entry).
 The distribution is irrelevant as long as the end-reader is able to copy the containing text along with each zero-width character.
@@ -36,4 +35,4 @@ English does not use any of our chosen zero-width characters, so there should be
 
 Next, each zero-width character is converted into two binary bits following the method defined above.
 
-Finally, the binary string is converted character-by-character into an ASCII string and is returned as output.
+Finally, the binary string is converted into a string with UTF-8 and decoded with rot13.
